@@ -4,7 +4,7 @@ import { BookingService } from './booking.service';
 import { Booking } from '@/entities/booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('bookings')
 @Controller('bookings')
@@ -12,7 +12,7 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all bookings for the current user' })
   @ApiResponse({ status: 200, description: 'Return all bookings', type: [Booking] })
@@ -21,7 +21,7 @@ export class BookingController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get booking by ID' })
   @ApiResponse({ status: 200, description: 'Return booking by ID', type: Booking })
@@ -31,7 +31,7 @@ export class BookingController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new booking' })
   @ApiResponse({ status: 201, description: 'Booking created successfully', type: Booking })
@@ -40,7 +40,7 @@ export class BookingController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a booking' })
   @ApiResponse({ status: 200, description: 'Booking updated successfully', type: Booking })
@@ -54,7 +54,7 @@ export class BookingController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Cancel a booking' })
   @ApiResponse({ status: 200, description: 'Booking cancelled successfully' })

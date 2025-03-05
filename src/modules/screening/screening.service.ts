@@ -150,7 +150,12 @@ export class ScreeningService {
       
       // Calculate end time
       const endTimeDate = new Date(startTimeToCheck);
+      if (!movieToCheck) {
+        throw new NotFoundException(`Movie not found`);
+      }
       endTimeDate.setMinutes(endTimeDate.getMinutes() + movieToCheck.durationMinutes + 30);
+
+      
       
       // Check for conflicts excluding the current screening
       const existingScreening = await this.screeningRepository.createQueryBuilder('screening')

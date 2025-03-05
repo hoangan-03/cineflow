@@ -4,7 +4,7 @@ import { ReviewService } from './review.service';
 import { Review } from '@/entities/review.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
+import { JWTAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { GetUser } from '@/modules/auth/decorators/get-user.decorator';
 import { User } from '@/entities/user.entity';
 
@@ -29,7 +29,7 @@ export class ReviewController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new review' })
   @ApiResponse({ status: 201, description: 'Review created successfully', type: Review })
@@ -41,7 +41,7 @@ export class ReviewController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a review' })
   @ApiResponse({ status: 200, description: 'Review updated successfully', type: Review })
@@ -55,7 +55,7 @@ export class ReviewController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JWTAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a review' })
   @ApiResponse({ status: 200, description: 'Review deleted successfully' })
