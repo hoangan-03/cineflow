@@ -1,7 +1,7 @@
 {
-  "name": "@infinivista/module-user",
+  "name": "cineflow",
   "version": "1.0.0",
-  "description": "module user for infinivista",
+  "description": "api for cineflow",
   "main": "dist/main.js",
   "scripts": {
     "start": "nest start",
@@ -19,13 +19,7 @@
     "migration:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d=./src/datasource/data-source.ts",
     "migration:revert": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d=./src/datasource/data-source.ts",
     "migrate": "npm run migration:generate && npm run migration:run",
-    "migrate:fresh": "rimraf migrations && ts-node src/utils/drop-database.ts && npm run migrate",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:restart": "docker-compose restart",
-    "docker:clean": "docker-compose down -v --remove-orphans"
+    "migrate:fresh": "rimraf migrations && ts-node src/utils/drop-database.ts && npm run migrate"
   },
   "dependencies": {
     "@golevelup/nestjs-rabbitmq": "^5.7.0",

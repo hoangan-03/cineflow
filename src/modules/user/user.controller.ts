@@ -3,7 +3,6 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { User } from "@/entities/user.entity";
 import { UserService } from "@/modules/user/services/user.service";
 import { UpdateUserDto } from "@/modules/user/dto/update-user.dto";
-import { SecurityAnswer } from "@/entities/security-answer.entity";
 import { Setting } from "@/entities/setting.entity";
 import { SettingType } from "@/modules/user/enums/setting.enum";
 
@@ -174,30 +173,7 @@ export class UsersController {
       },
     },
   })
-  @ApiResponse({
-    status: 201,
-    description: "Security questions set",
-    type: [SecurityAnswer],
-  })
-  async setSecurityQuestions(
-    @Param("id") id: string,
-    @Body("answers") answers: { questionId: string; answer: string }[]
-  ): Promise<SecurityAnswer[]> {
-    return this.userService.setSecurityQuestions(id, answers);
-  }
 
-  @Put(":id/online-status")
-  @ApiOperation({ summary: "Toggle user online status" })
-  @ApiBody({
-    schema: {
-      type: "object",
-      properties: {
-        isOnline: {
-          type: "boolean",
-        },
-      },
-    },
-  })
   @ApiResponse({
     status: 200,
     description: "Online status updated",

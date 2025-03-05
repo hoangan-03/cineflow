@@ -9,7 +9,6 @@ import {
 } from "@nestjs/common";
 import { validate as uuidValidate } from "uuid";
 import { Setting } from "@/entities/setting.entity";
-import { SecurityAnswer } from "@/entities/security-answer.entity";
 import { PaymentMethods } from "@/entities/payment-methods.entity";
 import { SettingType } from "@/modules/user/enums/setting.enum";
 @Injectable()
@@ -19,8 +18,6 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Setting)
     private readonly settingRepository: Repository<Setting>,
-    @InjectRepository(SecurityAnswer)
-    private readonly securityAnswerRepository: Repository<SecurityAnswer>,
     @InjectRepository(PaymentMethods)
     private readonly paymentMethodRepository: Repository<PaymentMethods>
   ) {}
@@ -105,28 +102,6 @@ export class UserService {
 
     return this.settingRepository.save(setting);
   }
-
-  // Security Management
-  async setSecurityQuestions(
-    userId: string,
-    answers: { questionId: string; answer: string }[]
-  ): Promise<SecurityAnswer[]> {
-    const savedAnswers: SecurityAnswer[] = [];
-
-    for (const ans of answers) {
-      const securityAnswer = this.securityAnswerRepository.create({
-        user_id: userId,
-        question_id: ans.questionId,
-        answer: ans.answer,
-      });
-      savedAnswers.push(
-        await this.securityAnswerRepository.save(securityAnswer)
-      );
-    }
-
-    return savedAnswers;
-  }
-
   // Payment Methods
   // async addPaymentMethod(
   //   userId: string,

@@ -26,18 +26,31 @@ const dropDatabase = async () => {
     
     console.log('Dropping database tables...');
     
-    // Drop tables with foreign keys first
+    // First drop tables with many-to-many relationships
+    await queryRunner.query('DROP TABLE IF EXISTS movie_genres CASCADE');
+    
+    // Drop cinema management system tables
+    await queryRunner.query('DROP TABLE IF EXISTS booked_seats CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS bookings CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS reviews CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS screenings CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS seats CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS theaters CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS cinemas CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS movies CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS genres CASCADE');
+    
+    // Drop user management tables
     await queryRunner.query('DROP TABLE IF EXISTS settings CASCADE');
-    await queryRunner.query('DROP TABLE IF EXISTS security_answers CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS payment_methods CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS user_status CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS users CASCADE');
-    await queryRunner.query('DROP TABLE IF EXISTS security_questions CASCADE');
-
+   
     // Drop any remaining types
     await queryRunner.query('DROP TYPE IF EXISTS gender_enum CASCADE');
     await queryRunner.query('DROP TYPE IF EXISTS setting_type_enum CASCADE');
     await queryRunner.query('DROP TYPE IF EXISTS payment_method_type_enum CASCADE');
+    await queryRunner.query('DROP TYPE IF EXISTS booking_status_enum CASCADE');
 
     console.log(`Database ${configService.get<string>('POSTGRES_DB')} tables dropped successfully.`);
     

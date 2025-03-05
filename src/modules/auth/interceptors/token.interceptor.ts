@@ -1,4 +1,3 @@
-// module-user/src/modules/auth/interceptors/token.interceptor.ts
 import {
     CallHandler,
     ExecutionContext,
@@ -22,7 +21,6 @@ import {
     ): Observable<any> {
       return next.handle().pipe(
         map(data => {
-          // Check if we have valid data to process
           if (!data) return data;
           
           const response = context.switchToHttp().getResponse<Response>();

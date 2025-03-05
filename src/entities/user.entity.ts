@@ -19,8 +19,6 @@ import { Gender } from "@/modules/user/enums/gender.enum";
 import { IsEnum, IsOptional } from "class-validator";
 import { BaseEntity } from "@/entities/base-class";
 import { Setting } from "./setting.entity";
-import { SecurityAnswer } from "./security-answer.entity";
-import { UserEventsService } from "@/rabbitmq/userevent.service";
 import { Inject } from "@nestjs/common";
 import { UserStatus } from "./user-status.entity";
 
@@ -136,47 +134,5 @@ export class User extends BaseEntity {
   @Column({ type: "text", nullable: true })
   address: string;
 
-  @OneToMany(() => SecurityAnswer, (securityAnswer) => securityAnswer.user)
-  securityAnswers: SecurityAnswer[];
-
-  constructor(data: Partial<User> = {}) {
-    super();
-    Object.assign(this, data);
-  }
-
-  @ApiProperty({
-    example: "302 Alibaba Street, Lagos, Nigeria",
-    description: "User address",
-    required: false,
-  })
-  @Column({ type: "text", nullable: true })
-
-  @Inject()
-  private readonly userEventsService: UserEventsService;
-
-  @AfterInsert()
-  async afterInsert() {
-    await this.userEventsService?.publishUserCreated({
-      id: this.id,
-      username: this.username,
-      email: this.email,
-      profileImageUrl: this.profileImageUrl,
-    });
-  }
-
-  @AfterUpdate()
-  async afterUpdate() {
-    await this.userEventsService?.publishUserUpdated({
-      id: this.id,
-      username: this.username,
-      profileImageUrl: this.profileImageUrl,
-    });
-  }
-
-  @BeforeRemove()
-  async beforeRemove() {
-    await this.userEventsService?.publishUserDeleted({
-      id: this.id,
-    });
-  }
+  
 }

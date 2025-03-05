@@ -6,7 +6,6 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
 import * as session from "express-session";
 import {useContainer} from "class-validator";
-import * as nodeCrypto from 'crypto';
 import * as compression from 'compression';
 
 // Polyfill global crypto if not defined
@@ -52,8 +51,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle("INFINIVISTA - User API")
-    .setDescription("API for user and auth modules")
+    .setTitle("Cineflow")
+    .setDescription("API for Cineflow")
     .setVersion("1.0")
     .addBearerAuth()
     .build();

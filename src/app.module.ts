@@ -4,11 +4,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from '@/app.controller';
 import { AppService } from '@/app.service';
 import { UserModule } from '@/modules/user/user.module';
-import { HealthModule } from '@/rabbitmq/healthcheck/healthcheck.module';
-import { RabbitmqModule } from '@/rabbitmq/rabbitmq.module';
 import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from '@/exception-filters/global-exception.filter';
 import { AuthModule } from './modules/auth/auth.module';
+import { BookingModule } from './modules/booking/booking.module';
+import { CinemaModule } from './modules/cinema/cinema.module';
+import { ReviewModule } from './modules/review/review.module';
+import { MovieModule } from './modules/movie/movie.module';
+import { TheaterModule } from './modules/theater/theater.module';
+import { ScreeningModule } from './modules/screening/screening.module';
 
 @Module({
   imports: [
@@ -27,8 +31,8 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule, AuthModule, HealthModule, RabbitmqModule
-  ],
+    UserModule, AuthModule, BookingModule, CinemaModule, MovieModule, TheaterModule, ReviewModule, BookingModule, ScreeningModule
+  ], 
   controllers: [AppController],
   providers: [
     AppService,
