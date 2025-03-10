@@ -19,7 +19,6 @@ import { UserStatus } from "@/entities/user-status.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 
 // Sample data
-
 const movieGenres = [
   "Action",
   "Adventure",
@@ -149,7 +148,6 @@ const cinemaData = [
   },
 ];
 
-// Helper functions
 const createFakePaymentMethod = (userId: string) => {
   const type = faker.helpers.arrayElement(Object.values(PaymentMethodType));
 
