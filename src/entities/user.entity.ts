@@ -21,6 +21,7 @@ import { BaseEntity } from "@/entities/base-class";
 import { Setting } from "./setting.entity";
 import { Inject } from "@nestjs/common";
 import { UserStatus } from "./user-status.entity";
+import { Role } from "@/modules/auth/enums/role.enum";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
@@ -134,5 +135,15 @@ export class User extends BaseEntity {
   @Column({ type: "text", nullable: true })
   address: string;
 
-  
+  @ApiProperty({
+    enum: Role,
+    example: Role.MOVIEGOER,
+    description: "User role"
+  })
+  @Column({
+    type: "enum",
+    enum: Role,
+    default: Role.MOVIEGOER
+  })
+  role: Role;
 }

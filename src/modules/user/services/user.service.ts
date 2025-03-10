@@ -11,6 +11,7 @@ import { validate as uuidValidate } from "uuid";
 import { Setting } from "@/entities/setting.entity";
 import { PaymentMethods } from "@/entities/payment-methods.entity";
 import { SettingType } from "@/modules/user/enums/setting.enum";
+import { Role } from "@/modules/auth/enums/role.enum";
 @Injectable()
 export class UserService {
   constructor(
@@ -24,8 +25,10 @@ export class UserService {
 
   // User Management
   async create(data: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(data);
-
+    const user = this.userRepository.create({
+      ...data,
+      role: Role.MOVIEGOER
+    });
     return this.userRepository.save(user);
   }
   async getAll(): Promise<User[]> {

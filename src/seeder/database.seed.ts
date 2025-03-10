@@ -17,7 +17,7 @@ import { Review } from "@/entities/review.entity";
 import { Genre } from "@/entities/genre.entity";
 import { UserStatus } from "@/entities/user-status.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
-
+import { Role } from "@/modules/auth/enums/role.enum";
 // Sample data
 const movieGenres = [
   "Action",
@@ -195,6 +195,7 @@ const createFakeUser = () => {
     profileImageUrl: faker.image.avatar(),
     coverImageUrl: faker.image.url(),
     address: faker.location.streetAddress(),
+    role: faker.helpers.arrayElement(Object.values(Role))
   };
 };
 

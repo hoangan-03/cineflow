@@ -36,27 +36,27 @@ export class AuthService {
       : false;
   }
 
-async register(signUp: RegisterUserDto): Promise<User> {
-  try {
-    const hashedPassword = await this.hashPassword(signUp.password);
-    const user = await this.userService.create({
-      ...signUp,
-      password: hashedPassword,
-    });
-    delete user.password;
-    return user; 
-  } catch (error) {
-    if (error instanceof Error) {
-      if ("code" in error && (error as any).code === "23505") {
-        throw new BadRequestException("Email or username already exists.");
+  async register(signUp: RegisterUserDto): Promise<User> {
+    try {
+      const hashedPassword = await this.hashPassword(signUp.password);
+      const user = await this.userService.create({
+        ...signUp,
+        password: hashedPassword,
+      });
+      delete user.password;
+      return user;
+    } catch (error) {
+      if (error instanceof Error) {
+        if ("code" in error && (error as any).code === "23505") {
+          throw new BadRequestException("Email or username already exists.");
+        }
+        throw new InternalServerErrorException(
+          error.message || "Registration failed."
+        );
       }
-      throw new InternalServerErrorException(
-        error.message || "Registration failed."
-      );
+      throw new InternalServerErrorException("An unexpected error occurred.");
     }
-    throw new InternalServerErrorException("An unexpected error occurred.");
   }
-}
 
   async login(email: string, password: string): Promise<AuthTokenResponseDto> {
     let user: User;
@@ -74,11 +74,12 @@ async register(signUp: RegisterUserDto): Promise<User> {
     return this.generateTokens(user);
   }
 
-  private generateTokens(user: User): AuthTokenResponseDto {
+  generateTokens(user: User): AuthTokenResponseDto {
     const payload: JwtPayload = {
       sub: user.id.toString(),
       email: user.email,
       username: user.username,
+      role: user.role,
     };
 
     const access_token = this.jwtService.sign(payload, {
@@ -114,23 +115,23 @@ async register(signUp: RegisterUserDto): Promise<User> {
     return user;
   }
 
-  async signToken(user: User | any): Promise<string> {
-    if (!user) {
-      throw new UnauthorizedException("Invalid user data: Missing user object");
-    }
+  // async signToken(user: User | any): Promise<string> {
+  //   if (!user) {
+  //     throw new UnauthorizedException("Invalid user data: Missing user object");
+  //   }
 
-    if (user.id === undefined || user.id === null) {
-      throw new UnauthorizedException("Invalid user data: Missing user ID");
-    }
+  //   if (user.id === undefined || user.id === null) {
+  //     throw new UnauthorizedException("Invalid user data: Missing user ID");
+  //   }
 
-    const payload: JwtPayload = {
-      sub: user.id.toString(),
-      email: user.email || "",
-      username: user.username || "",
-      iat: Date.now(),
-      exp: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
-    };
+  //   const payload: JwtPayload = {
+  //     sub: user.id.toString(),
+  //     email: user.email || "",
+  //     username: user.username || "",
+  //     iat: Date.now(),
+  //     exp: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
+  //   };
 
-    return this.jwtService.sign(payload);
-  }
+  //   return this.jwtService.sign(payload);
+  // }
 }

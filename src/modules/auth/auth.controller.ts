@@ -8,8 +8,10 @@ import {
   Post,
   UseGuards,
   UseInterceptors,
+  Res,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import { Response } from 'express';
 import { AuthUser } from '@/modules/user/decorators/user.decorator';
 import { User } from '@/entities/user.entity';
 import { AuthService } from '@/modules/auth/auth.service';
@@ -42,12 +44,24 @@ export class AuthController {
     status: 400,
     description: 'Bad Request - Invalid input data' 
   })
-  async register(@Body() signUp: RegisterUserDto): Promise<RegisterUserResponseDto> {
+  async register(
+    @Body() signUp: RegisterUserDto,
+    @Res({ passthrough: true }) response: Response
+  ): Promise<RegisterUserResponseDto> {
     const user = await this.authService.register(signUp);
     
-    // Create and attach a token to the response 
-    // manually instead of using the interceptor
-    const token = this.authService.signToken(user);
+    // Use generateTokens instead of signToken
+    const tokens = this.authService.generateTokens(user);
+    
+    // Set the token in cookies manually
+    response.cookie('token', tokens.data.access_token, {
+      httpOnly: true,
+      signed: true,
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+    });
+    
+    response.setHeader('Authorization', `Bearer ${tokens.data.access_token}`);
     
     // Transform to DTO before returning
     return new RegisterUserResponseDto(user.email, user.username);
