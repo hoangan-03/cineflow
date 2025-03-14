@@ -4,87 +4,96 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   ManyToMany,
-  JoinTable
+  JoinTable,
 } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseEntity } from "@/entities/base-class";
 import { Screening } from "@/entities/screening.entity";
 import { Review } from "@/entities/review.entity";
 import { Genre } from "@/entities/genre.entity";
+import defaultUrls from "@/constants/default-urls.constant";
 
 @Entity({ name: "movies" })
 export class Movie extends BaseEntity {
   @ApiProperty({
     example: "123e4567-e89b-12d3-a456-426614174000",
-    description: "Movie unique identifier"
+    description: "Movie unique identifier",
   })
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @ApiProperty({
     example: "Inception",
-    description: "Movie title"
+    description: "Movie title",
   })
   @Column({ type: "varchar", length: 255 })
   title: string;
 
   @ApiProperty({
-    example: "A thief who steals corporate secrets through the use of dream-sharing technology...",
-    description: "Movie description"
+    example:
+      "A thief who steals corporate secrets through the use of dream-sharing technology...",
+    description: "Movie description",
   })
   @Column({ type: "text" })
   description: string;
 
   @ApiProperty({
     example: "Christopher Nolan",
-    description: "Movie director"
+    description: "Movie director",
   })
   @Column({ type: "varchar", length: 255 })
   director: string;
 
   @ApiProperty({
     example: 148,
-    description: "Movie duration in minutes"
+    description: "Movie duration in minutes",
   })
-  @Column({ type: "integer" })
-  durationMinutes: number;
+  @Column({ type: "integer", nullable: true })
+  duration: number;
+
+  @ApiProperty({
+    example: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+    description: "Movie cast",
+  })
+  @Column({ type: "simple-array" })
+  cast: string[];
 
   @ApiProperty({
     example: "2010-07-16",
-    description: "Movie release date"
+    description: "Movie release date",
   })
   @Column({ type: "date" })
   releaseDate: Date;
 
   @ApiProperty({
     example: "https://example.com/poster.jpg",
-    description: "Movie poster URL"
+    description: "Movie poster URL",
   })
-  @Column({ type: "text" })
+  @Column({ type: "text", nullable: true, default: defaultUrls.POSTER_URL })
   posterUrl: string;
 
   @ApiProperty({
     example: "https://example.com/trailer.mp4",
-    description: "Movie trailer URL"
+    description: "Movie trailer URL",
   })
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, default: defaultUrls.TRAILER_URL })
   trailerUrl: string;
 
   @ApiProperty({
     type: () => [Genre],
-    description: "Movie genres"
+    description: "Movie genres",
   })
   @ManyToMany(() => Genre)
   @JoinTable({
     name: "movie_genres",
     joinColumn: { name: "movie_id", referencedColumnName: "id" },
-    inverseJoinColumn: { name: "genre_id", referencedColumnName: "id" }
+    inverseJoinColumn: { name: "genre_id", referencedColumnName: "id" },
   })
   genres: Genre[];
 
-  @OneToMany(() => Screening, screening => screening.movie)
+  @OneToMany(() => Screening, (screening) => screening.movie)
   screenings: Screening[];
 
-  @OneToMany(() => Review, review => review.movie)
+  @OneToMany(() => Review, (review) => review.movie)
   reviews: Review[];
 }

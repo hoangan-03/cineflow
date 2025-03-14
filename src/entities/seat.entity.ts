@@ -7,7 +7,7 @@ import {
   } from "typeorm";
   import { ApiProperty } from "@nestjs/swagger";
   import { BaseEntity } from "@/entities/base-class";
-  import { Theater } from "@/entities/theater.entity";
+  import { Room } from "@/entities/room.entity";
   
   @Entity({ name: "seats" })
   export class Seat extends BaseEntity {
@@ -40,12 +40,12 @@ import {
     type: string;
   
     @ApiProperty({
-      type: () => Theater,
+      type: () => Room,
       description: "The theater this seat belongs to"
     })
-    @ManyToOne(() => Theater)
+    @ManyToOne(() => Room)
     @JoinColumn({ name: "theater_id" })
-    theater: Theater;
+    theater: Room;
   
     @Column({ type: "uuid" })
     theater_id: string;

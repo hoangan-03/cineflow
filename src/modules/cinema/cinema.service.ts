@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cinema } from '@/entities/cinema.entity';
-import { Theater } from '@/entities/theater.entity';
+import { Room } from '@/entities/room.entity';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
 import { UpdateCinemaDto } from './dto/update-cinema.dto';
 
@@ -12,8 +12,8 @@ export class CinemaService {
     @InjectRepository(Cinema)
     private readonly cinemaRepository: Repository<Cinema>,
     
-    @InjectRepository(Theater)
-    private readonly theaterRepository: Repository<Theater>
+    @InjectRepository(Room)
+    private readonly theaterRepository: Repository<Room>
   ) {}
 
   async findAll(): Promise<Cinema[]> {
@@ -49,7 +49,7 @@ export class CinemaService {
     }
   }
 
-  async findTheaters(cinemaId: string): Promise<Theater[]> {
+  async findTheaters(cinemaId: string): Promise<Room[]> {
     const cinema = await this.cinemaRepository.findOne({ 
       where: { id: cinemaId },
       relations: ['theaters']

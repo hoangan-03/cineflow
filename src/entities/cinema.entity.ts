@@ -6,7 +6,8 @@ import {
   } from "typeorm";
   import { ApiProperty } from "@nestjs/swagger";
   import { BaseEntity } from "@/entities/base-class";
-  import { Theater } from "@/entities/theater.entity";
+  import { Room } from "@/entities/room.entity";
+import { Max, Min } from "class-validator";
   
   @Entity({ name: "cinemas" })
   export class Cinema extends BaseEntity {
@@ -18,24 +19,33 @@ import {
     id: string;
   
     @ApiProperty({
-      example: "Cineworld",
+      example: "CGV",
       description: "Cinema name"
     })
-    @Column({ type: "varchar", length: 255 })
+    @Column({ type: "varchar", length: 255, nullable: false, default: "CGV" })
     name: string;
+
+    @ApiProperty({
+      example: "John Alice",
+      description: "Cinema name"
+    })
+    @Column({ type: "varchar", length: 255, nullable: true })
+    owner: string;
   
     @ApiProperty({
       example: "123 Main Street, Cityville",
       description: "Cinema address"
     })
-    @Column({ type: "text" })
+    @Column({ type: "text", nullable: true })
     address: string;
   
+    @Min(8)
+    @Max(15)
     @ApiProperty({
       example: "+1234567890",
       description: "Cinema phone number"
     })
-    @Column({ type: "varchar", length: 20 })
+    @Column({ type: "varchar", length: 15, nullable: true })
     phoneNumber: string;
   
     @ApiProperty({
@@ -45,20 +55,6 @@ import {
     @Column({ type: "text", nullable: true })
     imageUrl: string;
   
-    @ApiProperty({
-      example: true,
-      description: "Whether the cinema has parking"
-    })
-    @Column({ type: "boolean", default: false })
-    hasParking: boolean;
-  
-    @ApiProperty({
-      example: true,
-      description: "Whether the cinema has food court"
-    })
-    @Column({ type: "boolean", default: false })
-    hasFoodCourt: boolean;
-  
-    @OneToMany(() => Theater, theater => theater.cinema)
-    theaters: Theater[];
+    @OneToMany(() => Room, theater => theater.cinema)
+    theaters: Room[];
   }

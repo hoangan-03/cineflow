@@ -11,7 +11,6 @@ import { BaseEntity } from "@/entities/base-class";
 import { User } from "@/entities/user.entity";
 import { Screening } from "@/entities/screening.entity";
 import { BookedSeat } from "@/entities/booked-seat.entity";
-import { PaymentMethods } from "@/entities/payment-methods.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 
 @Entity({ name: "bookings" })
@@ -77,17 +76,6 @@ export class Booking extends BaseEntity {
 
   @Column({ type: "uuid" })
   screening_id: string;
-
-  @ApiProperty({
-    type: () => PaymentMethods,
-    description: "The payment method used"
-  })
-  @ManyToOne(() => PaymentMethods)
-  @JoinColumn({ name: "payment_method_id" })
-  paymentMethod: PaymentMethods;
-
-  @Column({ type: "uuid" })
-  payment_method_id: string;
 
   @OneToMany(() => BookedSeat, bookedSeat => bookedSeat.booking, { cascade: true })
   bookedSeats: BookedSeat[];

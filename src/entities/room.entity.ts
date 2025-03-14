@@ -11,18 +11,18 @@ import { BaseEntity } from "@/entities/base-class";
 import { Cinema } from "@/entities/cinema.entity";
 import { Screening } from "@/entities/screening.entity";
 
-@Entity({ name: "theaters" })
-export class Theater extends BaseEntity {
+@Entity({ name: "rooms" })
+export class Room extends BaseEntity {
   @ApiProperty({
     example: "123e4567-e89b-12d3-a456-426614174000",
-    description: "Theater unique identifier"
+    description: "Room unique identifier"
   })
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @ApiProperty({
-    example: "Theater 1",
-    description: "Theater name/number"
+    example: "Room 1",
+    description: "Room name/number"
   })
   @Column({ type: "varchar", length: 50 })
   name: string;
@@ -33,20 +33,6 @@ export class Theater extends BaseEntity {
   })
   @Column({ type: "integer" })
   totalSeats: number;
-
-  @ApiProperty({
-    example: true,
-    description: "Whether the theater supports 3D"
-  })
-  @Column({ type: "boolean", default: false })
-  has3D: boolean;
-
-  @ApiProperty({
-    example: true,
-    description: "Whether the theater has IMAX"
-  })
-  @Column({ type: "boolean", default: false })
-  hasIMAX: boolean;
 
   @ApiProperty({
     type: () => Cinema,

@@ -3,8 +3,8 @@ import { IsNotEmpty, IsString, IsInt, IsBoolean, IsOptional, IsUUID } from 'clas
 
 export class CreateTheaterDto {
   @ApiProperty({
-    example: 'Theater 1',
-    description: 'Theater name/number',
+    example: 'Room 1',
+    description: 'Room name/number',
   })
   @IsNotEmpty()
   @IsString()

@@ -18,9 +18,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Gender } from "@/modules/user/enums/gender.enum";
 import { IsEnum, IsOptional } from "class-validator";
 import { BaseEntity } from "@/entities/base-class";
-import { Setting } from "./setting.entity";
 import { Inject } from "@nestjs/common";
-import { UserStatus } from "./user-status.entity";
 import { Role } from "@/modules/auth/enums/role.enum";
 
 @Entity({ name: "users" })
@@ -40,8 +38,8 @@ export class User extends BaseEntity {
   email: string;
 
   @ApiProperty({
-    example: "johndoe",
-    description: "User username",
+    example: "John Nguyen",
+    description: "User name",
   })
   @Column({ type: "varchar", length: 255, unique: true })
   username: string;
@@ -77,21 +75,6 @@ export class User extends BaseEntity {
   @IsEnum(Gender)
   gender?: Gender;
 
-  @ApiProperty({
-    example: "John",
-    description: "User first name",
-    required: false,
-  })
-  @Column({ type: "varchar", length: 255, nullable: true })
-  firstName: string;
-
-  @ApiProperty({
-    example: "Doe",
-    description: "User last name",
-    required: false,
-  })
-  @Column({ type: "varchar", length: 255, nullable: true })
-  lastName: string;
 
   @ApiProperty({
     example: "https://example.com/profile.jpg",
@@ -100,32 +83,6 @@ export class User extends BaseEntity {
   })
   @Column({ type: "text", nullable: true })
   profileImageUrl: string;
-
-  @ApiProperty({
-    example: "https://example.com/cover.jpg",
-    description: "User cover image URL",
-    required: false,
-  })
-  @Column({ type: "text", nullable: true })
-  coverImageUrl: string;
-
-  @ApiProperty({
-    type: () => UserStatus,
-    description: "User status",
-  })
-  @OneToOne(() => UserStatus, (status) => status.user, {
-    cascade: true,
-  })
-  status: UserStatus;
-
-  @ApiProperty({
-    type: () => [Setting],
-    description: "User settings",
-  })
-  @OneToMany(() => Setting, (setting) => setting.user, {
-    cascade: true,
-  })
-  settings: Setting[];
 
   @ApiProperty({
     example: "https://example.com/profile.jpg",

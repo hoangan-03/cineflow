@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { Screening } from '@/entities/screening.entity';
 import { Movie } from '@/entities/movie.entity';
-import { Theater } from '@/entities/theater.entity';
+import { Room } from '@/entities/room.entity';
 import { CreateScreeningDto } from './dto/create-screening.dto';
 import { UpdateScreeningDto } from './dto/update-screening.dto';
 
@@ -16,8 +16,8 @@ export class ScreeningService {
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
     
-    @InjectRepository(Theater)
-    private readonly theaterRepository: Repository<Theater>,
+    @InjectRepository(Room)
+    private readonly theaterRepository: Repository<Room>,
   ) {}
 
   async findAll(
@@ -84,7 +84,7 @@ export class ScreeningService {
     // Verify theater exists
     const theater = await this.theaterRepository.findOne({ where: { id: theater_id } });
     if (!theater) {
-      throw new NotFoundException(`Theater with ID ${theater_id} not found`);
+      throw new NotFoundException(`Room with ID ${theater_id} not found`);
     }
     
     // Check for screening time conflicts in the same theater
@@ -93,7 +93,7 @@ export class ScreeningService {
     
     // Calculate end time based on movie duration (adding buffer time of 30 minutes)
     const endTimeDate = new Date(startTimeDate);
-    endTimeDate.setMinutes(endTimeDate.getMinutes() + movie.durationMinutes + 30);
+    endTimeDate.setMinutes(endTimeDate.getMinutes() + movie.duration+ 30);
     
     // Check for conflicts
     const existingScreening = await this.screeningRepository.findOne({
@@ -133,7 +133,7 @@ export class ScreeningService {
     if (theater_id) {
       const theater = await this.theaterRepository.findOne({ where: { id: theater_id } });
       if (!theater) {
-        throw new NotFoundException(`Theater with ID ${theater_id} not found`);
+        throw new NotFoundException(`Room with ID ${theater_id} not found`);
       }
     }
     
@@ -153,7 +153,7 @@ export class ScreeningService {
       if (!movieToCheck) {
         throw new NotFoundException(`Movie not found`);
       }
-      endTimeDate.setMinutes(endTimeDate.getMinutes() + movieToCheck.durationMinutes + 30);
+      endTimeDate.setMinutes(endTimeDate.getMinutes() + movieToCheck.duration + 30);
 
       
       

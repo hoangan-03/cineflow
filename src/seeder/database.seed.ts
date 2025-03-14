@@ -1,21 +1,17 @@
 import { DataSource } from "typeorm";
 import { faker } from "@faker-js/faker";
 import { User } from "@/entities/user.entity";
-import { Setting } from "@/entities/setting.entity";
 import { Gender } from "@/modules/user/enums/gender.enum";
-import { SettingType } from "@/modules/user/enums/setting.enum";
-import { PaymentMethods } from "@/entities/payment-methods.entity";
 import { PaymentMethodType } from "@/modules/user/enums/payment-method.enum";
 import { Movie } from "@/entities/movie.entity";
 import { Cinema } from "@/entities/cinema.entity";
-import { Theater } from "@/entities/theater.entity";
+import { Room } from "@/entities/room.entity";
 import { Seat } from "@/entities/seat.entity";
 import { Screening } from "@/entities/screening.entity";
 import { Booking } from "@/entities/booking.entity";
 import { BookedSeat } from "@/entities/booked-seat.entity";
 import { Review } from "@/entities/review.entity";
 import { Genre } from "@/entities/genre.entity";
-import { UserStatus } from "@/entities/user-status.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 import { Role } from "@/modules/auth/enums/role.enum";
 // Sample data
@@ -35,7 +31,6 @@ const movieGenres = [
   "Thriller",
   "Western",
 ];
-
 const movieData = [
   {
     title: "Inception",
@@ -46,6 +41,14 @@ const movieData = [
     releaseDate: new Date("2010-07-16"),
     posterUrl: "https://example.com/inception_poster.jpg",
     trailerUrl: "https://example.com/inception_trailer.mp4",
+    cast: [
+      "Leonardo DiCaprio",
+      "Joseph Gordon-Levitt",
+      "Elliot Page",
+      "Tom Hardy",
+      "Ken Watanabe",
+      "Marion Cotillard"
+    ],
     genreNames: ["Action", "Sci-Fi", "Thriller"],
   },
   {
@@ -57,6 +60,14 @@ const movieData = [
     releaseDate: new Date("1994-09-23"),
     posterUrl: "https://example.com/shawshank_poster.jpg",
     trailerUrl: "https://example.com/shawshank_trailer.mp4",
+    cast: [
+      "Tim Robbins",
+      "Morgan Freeman",
+      "Bob Gunton",
+      "William Sadler",
+      "Clancy Brown",
+      "Gil Bellows"
+    ],
     genreNames: ["Drama"],
   },
   {
@@ -68,6 +79,14 @@ const movieData = [
     releaseDate: new Date("1972-03-24"),
     posterUrl: "https://example.com/godfather_poster.jpg",
     trailerUrl: "https://example.com/godfather_trailer.mp4",
+    cast: [
+      "Marlon Brando",
+      "Al Pacino",
+      "James Caan",
+      "Robert Duvall",
+      "Diane Keaton",
+      "Talia Shire"
+    ],
     genreNames: ["Crime", "Drama"],
   },
   {
@@ -79,6 +98,14 @@ const movieData = [
     releaseDate: new Date("1994-10-14"),
     posterUrl: "https://example.com/pulpfiction_poster.jpg",
     trailerUrl: "https://example.com/pulpfiction_trailer.mp4",
+    cast: [
+      "John Travolta",
+      "Samuel L. Jackson",
+      "Uma Thurman",
+      "Bruce Willis",
+      "Ving Rhames",
+      "Tim Roth"
+    ],
     genreNames: ["Crime", "Drama"],
   },
   {
@@ -90,6 +117,14 @@ const movieData = [
     releaseDate: new Date("1994-07-06"),
     posterUrl: "https://example.com/forrestgump_poster.jpg",
     trailerUrl: "https://example.com/forrestgump_trailer.mp4",
+    cast: [
+      "Tom Hanks",
+      "Robin Wright",
+      "Gary Sinise",
+      "Sally Field",
+      "Mykelti Williamson",
+      "Rebecca Williams"
+    ],
     genreNames: ["Drama", "Romance"],
   },
   {
@@ -101,6 +136,14 @@ const movieData = [
     releaseDate: new Date("2008-07-18"),
     posterUrl: "https://example.com/darkknight_poster.jpg",
     trailerUrl: "https://example.com/darkknight_trailer.mp4",
+    cast: [
+      "Christian Bale",
+      "Heath Ledger",
+      "Aaron Eckhart",
+      "Michael Caine",
+      "Gary Oldman",
+      "Morgan Freeman"
+    ],
     genreNames: ["Action", "Crime", "Drama"],
   },
 ];
@@ -108,67 +151,40 @@ const movieData = [
 const cinemaData = [
   {
     name: "Cineworld Downtown",
+    owner: "John Smith",
     address: "123 Main Street, Downtown, NY 10001",
     phoneNumber: "+1234567890",
     imageUrl: "https://example.com/cineworld_downtown.jpg",
-    hasParking: true,
-    hasFoodCourt: true,
   },
   {
     name: "Starlight Cinema",
+    owner: "Emma Johnson",
     address: "456 Broadway, West End, NY 10002",
     phoneNumber: "+1234567891",
     imageUrl: "https://example.com/starlight.jpg",
-    hasParking: true,
-    hasFoodCourt: false,
   },
   {
     name: "Landmark Theaters",
+    owner: "David Williams",
     address: "789 Oak Avenue, East Side, NY 10003",
     phoneNumber: "+1234567892",
     imageUrl: "https://example.com/landmark.jpg",
-    hasParking: false,
-    hasFoodCourt: true,
   },
   {
     name: "Regal Cinemas",
+    owner: "Sarah Brown",
     address: "101 Pine Street, North Side, NY 10004",
     phoneNumber: "+1234567893",
     imageUrl: "https://example.com/regal.jpg",
-    hasParking: true,
-    hasFoodCourt: true,
   },
   {
     name: "AMC Theaters",
+    owner: "Michael Davis",
     address: "202 Maple Road, South Side, NY 10005",
     phoneNumber: "+1234567894",
     imageUrl: "https://example.com/amc.jpg",
-    hasParking: true,
-    hasFoodCourt: true,
   },
 ];
-
-const createFakePaymentMethod = (userId: string) => {
-  const type = faker.helpers.arrayElement(Object.values(PaymentMethodType));
-
-  return {
-    user_id: userId,
-    payment_method: type,
-    card_last_four:
-      type === PaymentMethodType.PAYPAL
-        ? faker.finance.creditCardNumber("####")
-        : undefined,
-    payment_token: `tok_${faker.string.alphanumeric(10)}`,
-    card_expiration_date:
-      type === PaymentMethodType.PAYPAL
-        ? `${faker.date.future().getMonth() + 1}/${faker.date
-            .future()
-            .getFullYear()
-            .toString()
-            .slice(-2)}`
-        : undefined,
-  };
-};
 
 const createFakeUser = () => {
   const gender = faker.helpers.arrayElement([
@@ -195,7 +211,7 @@ const createFakeUser = () => {
     profileImageUrl: faker.image.avatar(),
     coverImageUrl: faker.image.url(),
     address: faker.location.streetAddress(),
-    role: faker.helpers.arrayElement(Object.values(Role))
+    role: faker.helpers.arrayElement(Object.values(Role)),
   };
 };
 
@@ -212,7 +228,7 @@ const createFakeReview = (userId: string, movieId: string) => {
   };
 };
 
-// Main seeding function
+// Seeding function
 export const seedDatabase = async (
   dataSource: DataSource,
   userCount: number
@@ -221,13 +237,10 @@ export const seedDatabase = async (
 
   // Get all repositories
   const userRepository = dataSource.getRepository(User);
-  const userStatusRepository = dataSource.getRepository(UserStatus);
-  const settingRepository = dataSource.getRepository(Setting);
-  const paymentMethodRepository = dataSource.getRepository(PaymentMethods);
   const genreRepository = dataSource.getRepository(Genre);
   const movieRepository = dataSource.getRepository(Movie);
   const cinemaRepository = dataSource.getRepository(Cinema);
-  const theaterRepository = dataSource.getRepository(Theater);
+  const theaterRepository = dataSource.getRepository(Room);
   const seatRepository = dataSource.getRepository(Seat);
   const screeningRepository = dataSource.getRepository(Screening);
   const bookingRepository = dataSource.getRepository(Booking);
@@ -239,13 +252,13 @@ export const seedDatabase = async (
 
   // Use a transaction for the delete operations
   await dataSource.transaction(async (manager) => {
-    // Delete in proper order (child tables first)
+    // Delete in proper order
     await manager.query('DELETE FROM "booked_seats"');
     await manager.query('DELETE FROM "bookings"');
     await manager.query('DELETE FROM "reviews"');
     await manager.query('DELETE FROM "screenings"');
     await manager.query('DELETE FROM "seats"');
-    await manager.query('DELETE FROM "theaters"');
+    await manager.query('DELETE FROM "rooms"');
     await manager.query('DELETE FROM "cinemas"');
 
     // Handle many-to-many relationship for movies and genres
@@ -253,13 +266,10 @@ export const seedDatabase = async (
     await manager.query('DELETE FROM "movies"');
     await manager.query('DELETE FROM "genres"');
 
-    await manager.query('DELETE FROM "payment_methods"');
-    await manager.query('DELETE FROM "settings"');
-    await manager.query('DELETE FROM "user_status"');
     await manager.query('DELETE FROM "users"');
   });
 
-  // 2. Seed users
+  // Seed users
   console.log(`Seeding ${userCount} users...`);
   const users: User[] = [];
 
@@ -270,53 +280,10 @@ export const seedDatabase = async (
     const user = userRepository.create(userData);
     await userRepository.save(user);
     users.push(user);
-
-    // Create user status
-    const userStatus = userStatusRepository.create({
-      user_id: user.id,
-      isOnline: faker.datatype.boolean(),
-      isSuspended: false,
-      isDeleted: false,
-    });
-    await userStatusRepository.save(userStatus);
-
-    // Add payment methods (1-3 per user)
-    const paymentMethodsCount = faker.number.int({ min: 1, max: 3 });
-    for (let j = 0; j < paymentMethodsCount; j++) {
-      const paymentMethodData = createFakePaymentMethod(user.id);
-      const paymentMethod = paymentMethodRepository.create(paymentMethodData);
-      await paymentMethodRepository.save(paymentMethod);
-    }
-
-    // Add settings
-    const settingsData = [
-      {
-        user_id: user.id,
-        type: SettingType.NOTIFICATION,
-        value: faker.datatype.boolean().toString(),
-      },
-      {
-        user_id: user.id,
-        type: SettingType.THEME,
-        value: faker.helpers.arrayElement(["light", "dark"]),
-      },
-      {
-        user_id: user.id,
-        type: SettingType.LANGUAGE,
-        value: faker.location.countryCode(),
-      },
-    ];
-
-    for (const setting of settingsData) {
-      const newSetting = settingRepository.create(setting);
-      await settingRepository.save(newSetting);
-    }
   }
-  console.log(
-    `✅ Created ${users.length} users with settings, statuses, and payment methods`
-  );
+  console.log(`✅ Created ${users.length} users`);
 
-  // 3. Seed genres
+  // Seed genres
   console.log("🎭 Seeding movie genres...");
   const genres: Genre[] = [];
 
@@ -327,7 +294,7 @@ export const seedDatabase = async (
   }
   console.log(`✅ Created ${genres.length} movie genres`);
 
-  // 4. Seed movies with genres
+  // Seed movies with genres
   console.log("🎬 Seeding movies...");
   const movies: Movie[] = [];
 
@@ -349,7 +316,7 @@ export const seedDatabase = async (
   }
   console.log(`✅ Created ${movies.length} movies with genres`);
 
-  // 5. Seed cinemas
+  // Seed cinemas
   console.log("🏢 Seeding cinemas...");
   const cinemas: Cinema[] = [];
 
@@ -360,16 +327,16 @@ export const seedDatabase = async (
   }
   console.log(`✅ Created ${cinemas.length} cinemas`);
 
-  // 6. Seed theaters (2-4 per cinema)
+  // Seed theaters (2-4 per cinema)
   console.log("🎦 Seeding theaters...");
-  const theaters: Theater[] = [];
+  const theaters: Room[] = [];
 
   for (const cinema of cinemas) {
     const theaterCount = faker.number.int({ min: 2, max: 4 });
 
     for (let i = 1; i <= theaterCount; i++) {
       const theaterData = {
-        name: `Theater ${i}`,
+        name: `Room ${i}`,
         totalSeats: faker.number.int({ min: 50, max: 200 }),
         has3D: faker.datatype.boolean(),
         hasIMAX: faker.datatype.boolean(),
@@ -419,7 +386,6 @@ export const seedDatabase = async (
   // 8. Seed screenings (multiple per theater for different movies)
   console.log("🎞️ Seeding movie screenings...");
   const screenings: Screening[] = [];
-  const formats = ["2D", "3D", "IMAX"];
 
   // Create screenings for the next 7 days
   for (let day = 0; day < 7; day++) {
@@ -438,16 +404,8 @@ export const seedDatabase = async (
         const startHour = 10 + i * 3; // Starting at 10 AM with 3 hours between screenings
         const screeningDateTime = new Date(screeningDate);
         screeningDateTime.setHours(startHour, 0, 0, 0);
-
-        // Determine format based on theater capabilities
-        let format = "2D";
-        if (theater.has3D && faker.datatype.boolean()) {
-          format = "3D";
-        } else if (theater.hasIMAX && faker.datatype.boolean()) {
-          format = "IMAX";
-        }
-
-        // Set price based on format
+        const formats = ["2D", "3D", "IMAX"];
+        const format = faker.helpers.arrayElement(formats);
         let price = 12.99;
         if (format === "3D") price = 14.99;
         if (format === "IMAX") price = 16.99;
@@ -504,13 +462,6 @@ export const seedDatabase = async (
     const bookingUsers = faker.helpers.arrayElements(users, bookingUsersCount);
 
     for (const user of bookingUsers) {
-      // Get a payment method for this user
-      const paymentMethod = await paymentMethodRepository.findOne({
-        where: { id: user.id },
-      });
-
-      if (!paymentMethod) continue;
-
       // Get available seats for this theater
       const availableSeats = await seatRepository.find({
         where: { theater_id: screening.theater_id },
@@ -536,7 +487,6 @@ export const seedDatabase = async (
         status: faker.helpers.arrayElement(Object.values(BookingStatus)),
         user_id: user.id,
         screening_id: screening.id,
-        payment_method_id: paymentMethod.id,
       };
 
       const booking = bookingRepository.create(bookingData);

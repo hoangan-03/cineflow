@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Theater } from '@/entities/theater.entity';
+import { Room } from '@/entities/room.entity';
 import { Seat } from '@/entities/seat.entity';
 import { Cinema } from '@/entities/cinema.entity';
 import { CreateTheaterDto } from './dto/create-theater.dto';
@@ -10,8 +10,8 @@ import { UpdateTheaterDto } from './dto/update-theater.dto';
 @Injectable()
 export class TheaterService {
   constructor(
-    @InjectRepository(Theater)
-    private readonly theaterRepository: Repository<Theater>,
+    @InjectRepository(Room)
+    private readonly theaterRepository: Repository<Room>,
     
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
@@ -20,24 +20,24 @@ export class TheaterService {
     private readonly cinemaRepository: Repository<Cinema>
   ) {}
 
-  async findAll(): Promise<Theater[]> {
+  async findAll(): Promise<Room[]> {
     return this.theaterRepository.find();
   }
 
-  async findOne(id: string): Promise<Theater> {
+  async findOne(id: string): Promise<Room> {
     const theater = await this.theaterRepository.findOne({ 
       where: { id },
       relations: ['cinema']
     });
     
     if (!theater) {
-      throw new NotFoundException(`Theater with ID ${id} not found`);
+      throw new NotFoundException(`Room with ID ${id} not found`);
     }
     
     return theater;
   }
 
-  async create(createTheaterDto: CreateTheaterDto): Promise<Theater> {
+  async create(createTheaterDto: CreateTheaterDto): Promise<Room> {
     const { cinema_id, ...theaterData } = createTheaterDto;
     
     // Verify cinema exists
@@ -54,7 +54,7 @@ export class TheaterService {
     return this.theaterRepository.save(theater);
   }
 
-  async update(id: string, updateTheaterDto: UpdateTheaterDto): Promise<Theater> {
+  async update(id: string, updateTheaterDto: UpdateTheaterDto): Promise<Room> {
     const theater = await this.findOne(id);
     
     if (updateTheaterDto.cinema_id) {
@@ -78,7 +78,7 @@ export class TheaterService {
     const result = await this.theaterRepository.delete(id);
     
     if (result.affected === 0) {
-      throw new NotFoundException(`Theater with ID ${id} not found`);
+      throw new NotFoundException(`Room with ID ${id} not found`);
     }
   }
 

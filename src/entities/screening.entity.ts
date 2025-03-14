@@ -9,7 +9,7 @@ import {
   import { ApiProperty } from "@nestjs/swagger";
   import { BaseEntity } from "@/entities/base-class";
   import { Movie } from "@/entities/movie.entity";
-  import { Theater } from "@/entities/theater.entity";
+  import { Room } from "@/entities/room.entity";
   import { Booking } from "@/entities/booking.entity";
   
   @Entity({ name: "screenings" })
@@ -61,12 +61,12 @@ import {
     movie_id: string;
   
     @ApiProperty({
-      type: () => Theater,
+      type: () => Room,
       description: "The theater where the screening takes place"
     })
-    @ManyToOne(() => Theater, theater => theater.screenings)
+    @ManyToOne(() => Room, theater => theater.screenings)
     @JoinColumn({ name: "theater_id" })
-    theater: Theater;
+    theater: Room;
   
     @Column({ type: "uuid" })
     theater_id: string;

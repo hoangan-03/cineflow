@@ -4,10 +4,10 @@ import { ScreeningController } from './screening.controller';
 import { ScreeningService } from './screening.service';
 import { Screening } from '@/entities/screening.entity';
 import { Movie } from '@/entities/movie.entity';
-import { Theater } from '@/entities/theater.entity';
+import { Room } from '@/entities/room.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Screening, Movie, Theater])],
+  imports: [TypeOrmModule.forFeature([Screening, Movie, Room])],
   controllers: [ScreeningController],
   providers: [ScreeningService],
   exports: [ScreeningService],

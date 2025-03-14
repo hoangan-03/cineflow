@@ -8,26 +8,19 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { validate as uuidValidate } from "uuid";
-import { Setting } from "@/entities/setting.entity";
-import { PaymentMethods } from "@/entities/payment-methods.entity";
-import { SettingType } from "@/modules/user/enums/setting.enum";
 import { Role } from "@/modules/auth/enums/role.enum";
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    @InjectRepository(Setting)
-    private readonly settingRepository: Repository<Setting>,
-    @InjectRepository(PaymentMethods)
-    private readonly paymentMethodRepository: Repository<PaymentMethods>
+    private readonly userRepository: Repository<User>
   ) {}
 
   // User Management
   async create(data: Partial<User>): Promise<User> {
     const user = this.userRepository.create({
       ...data,
-      role: Role.MOVIEGOER
+      role: Role.MOVIEGOER,
     });
     return this.userRepository.save(user);
   }
@@ -50,7 +43,9 @@ export class UserService {
             .join(", ")
         : "unknown";
 
-      throw new NotFoundException(`There isn't any user with id:  ${identifier}`);
+      throw new NotFoundException(
+        `There isn't any user with id:  ${identifier}`
+      );
     }
     return user;
   }
@@ -74,37 +69,6 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async updateCoverPhoto(id: string, imageUrl: string): Promise<User> {
-    const user = await this.getOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`There isn't any user with id: ${id}`);
-    }
-    user.coverImageUrl = imageUrl;
-    return this.userRepository.save(user);
-  }
-
-  // Settings Management
-  async updateUserSettings(
-    userId: string,
-    type: SettingType,
-    value: string
-  ): Promise<Setting> {
-    let setting = await this.settingRepository.findOne({
-      where: { user_id: userId, type },
-    });
-
-    if (!setting) {
-      setting = this.settingRepository.create({
-        user_id: userId,
-        type,
-        value,
-      });
-    } else {
-      setting.value = value;
-    }
-
-    return this.settingRepository.save(setting);
-  }
   // Payment Methods
   // async addPaymentMethod(
   //   userId: string,
@@ -118,44 +82,4 @@ export class UserService {
   // }
 
   // User Status
-  async toggleOnlineStatus(id: string, isOnline: boolean): Promise<User> {
-    const user = await this.getOne({ where: { id } });
-    user.status.isOnline = isOnline;
-    return this.userRepository.save(user);
-  }
-
-  async suspendUser(id: string, suspended: boolean): Promise<User> {
-    const user = await this.getOne({ where: { id } });
-    user.status.isSuspended = suspended;
-    return this.userRepository.save(user);
-  }
-
-  // Advanced Queries
-  async findBySecurityAnswer(
-    questionId: string,
-    answer: string
-  ): Promise<User | undefined> {
-    const result = await this.userRepository
-      .createQueryBuilder("user")
-      .innerJoin("user.securityAnswers", "answer")
-      .where("answer.question_id = :questionId", { questionId })
-      .andWhere("answer.answer = :answer", { answer })
-      .getOne();
-    return result || undefined;
-  }
-
-  async getUserWithFullProfile(id: string): Promise<User> {
-    const result = await this.userRepository
-      .createQueryBuilder("user")
-      .leftJoinAndSelect("user.setting", "setting")
-      .leftJoinAndSelect("user.address", "address")
-      .leftJoinAndSelect("user.securityAnswers", "securityAnswers")
-      .leftJoinAndSelect("securityAnswers.question", "question")
-      .where("user.id = :id", { id })
-      .getOne();
-    if (!result) {
-      throw new NotFoundException(`There isn't any user with id: ${id}`);
-    }
-    return result;
-  }
 }
