@@ -6,7 +6,7 @@ import {
   ManyToMany,
   JoinTable,
 } from "typeorm";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { BaseEntity } from "@/entities/base-class";
 import { Screening } from "@/entities/screening.entity";
 import { Review } from "@/entities/review.entity";
@@ -26,7 +26,7 @@ export class Movie extends BaseEntity {
     example: "Inception",
     description: "Movie title",
   })
-  @Column({ type: "varchar", length: 255 })
+  @Column({ type: "varchar", length: 64 })
   title: string;
 
   @ApiProperty({
@@ -41,14 +41,14 @@ export class Movie extends BaseEntity {
     example: "Christopher Nolan",
     description: "Movie director",
   })
-  @Column({ type: "varchar", length: 255 })
+  @Column({ type: "varchar", length: 64 })
   director: string;
 
   @ApiProperty({
     example: 148,
     description: "Movie duration in minutes",
   })
-  @Column({ type: "integer", nullable: true })
+  @Column({ type: "integer"})
   duration: number;
 
   @ApiProperty({
@@ -65,19 +65,26 @@ export class Movie extends BaseEntity {
   @Column({ type: "date" })
   releaseDate: Date;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: "https://example.com/poster.jpg",
     description: "Movie poster URL",
   })
   @Column({ type: "text", nullable: true, default: defaultUrls.POSTER_URL })
   posterUrl: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: "https://example.com/trailer.mp4",
     description: "Movie trailer URL",
   })
   @Column({ type: "text", nullable: true, default: defaultUrls.TRAILER_URL })
   trailerUrl: string;
+
+  @ApiProperty({
+    example: "PG-13",
+    description: "Movie rating",
+  })
+  @Column({ type: "varchar", length: 5 })
+  rated: string;
 
   @ApiProperty({
     type: () => [Genre],
