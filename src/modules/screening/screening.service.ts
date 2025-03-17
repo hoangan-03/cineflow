@@ -27,8 +27,8 @@ export class ScreeningService {
   ): Promise<Screening[]> {
     const queryBuilder = this.screeningRepository.createQueryBuilder('screening')
       .leftJoinAndSelect('screening.movie', 'movie')
-      .leftJoinAndSelect('screening.theater', 'theater')
-      .leftJoinAndSelect('theater.cinema', 'cinema');
+      .leftJoinAndSelect('screening.room', 'room')
+      .leftJoinAndSelect('room.cinema', 'cinema');
     
     if (movieId) {
       queryBuilder.andWhere('screening.movie_id = :movieId', { movieId });
@@ -62,7 +62,7 @@ export class ScreeningService {
   async findOne(id: string): Promise<Screening> {
     const screening = await this.screeningRepository.findOne({ 
       where: { id },
-      relations: ['movie', 'theater', 'theater.cinema']
+      relations: ['movie', 'room', 'room.cinema']
     });
     
     if (!screening) {
@@ -81,13 +81,13 @@ export class ScreeningService {
       throw new NotFoundException(`Movie with ID ${movie_id} not found`);
     }
     
-    // Verify theater exists
-    const theater = await this.theaterRepository.findOne({ where: { id: theater_id } });
-    if (!theater) {
+    // Verify room exists
+    const room = await this.theaterRepository.findOne({ where: { id: theater_id } });
+    if (!room) {
       throw new NotFoundException(`Room with ID ${theater_id} not found`);
     }
     
-    // Check for screening time conflicts in the same theater
+    // Check for screening time conflicts in the same room
     const { startTime } = createScreeningDto;
     const startTimeDate = new Date(startTime);
     
@@ -107,7 +107,7 @@ export class ScreeningService {
     });
     
     if (existingScreening) {
-      throw new BadRequestException('There is a scheduling conflict with another screening in this theater');
+      throw new BadRequestException('There is a scheduling conflict with another screening in this room');
     }
     
     const screening = this.screeningRepository.create({
@@ -131,13 +131,13 @@ export class ScreeningService {
     }
     
     if (theater_id) {
-      const theater = await this.theaterRepository.findOne({ where: { id: theater_id } });
-      if (!theater) {
+      const room = await this.theaterRepository.findOne({ where: { id: theater_id } });
+      if (!room) {
         throw new NotFoundException(`Room with ID ${theater_id} not found`);
       }
     }
     
-    // If startTime or theater is changing, check for conflicts
+    // If startTime or room is changing, check for conflicts
     if (updateScreeningDto.startTime || theater_id) {
       const movieToCheck = movie_id 
         ? await this.movieRepository.findOne({ where: { id: movie_id } })
@@ -171,7 +171,7 @@ export class ScreeningService {
         .getOne();
       
       if (existingScreening) {
-        throw new BadRequestException('There is a scheduling conflict with another screening in this theater');
+        throw new BadRequestException('There is a scheduling conflict with another screening in this room');
       }
     }
     

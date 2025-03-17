@@ -1,52 +1,52 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsEnum, IsDateString } from 'class-validator';
-import { Gender } from '../enums/gender.enum';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsOptional, IsString, IsEnum, IsDateString } from "class-validator";
+import { Gender } from "../enums/gender.enum";
 
 export class UpdateUserDto {
   @ApiPropertyOptional({
-    example: '+1234567890',
-    description: 'User phone number',
+    example: "+1234567890",
+    description: "User phone number",
     required: false,
   })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
 
-  @ApiProperty({
-    example: '1990-01-01',
-    description: 'User date of birth',
-    required: false
+  @ApiPropertyOptional({
+    example: "1990-01-01",
+    description: "User date of birth",
+    required: false,
   })
   @IsOptional()
   @IsDateString()
   dob?: Date;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: Gender,
-    enumName: 'Gender',
+    enumName: "Gender",
     example: Gender.MALE,
-    description: 'User gender',
-    required: false
+    description: "User gender",
+    required: false,
   })
   @IsOptional()
   @IsEnum(Gender)
   gender?: Gender;
 
-  @ApiProperty({
-    example: 'John',
-    description: 'User first name',
-    required: false
+  @ApiPropertyOptional({
+    example: "https://example.com/profile.jpg",
+    description: "User profile image URL",
+    nullable: true,
   })
   @IsOptional()
   @IsString()
-  firstName?: string;
+  profileImageUrl?: string;
 
-  @ApiProperty({
-    example: 'Doe',
-    description: 'User last name',
-    required: false
+  @ApiPropertyOptional({
+    example: "47 ABC Street, XYZ City",
+    description: "User address",
+    nullable: true,
   })
   @IsOptional()
   @IsString()
-  lastName?: string;
+  address?: string;
 }

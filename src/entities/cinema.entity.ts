@@ -55,6 +55,6 @@ import { Max, Min } from "class-validator";
     @Column({ type: "text", nullable: true })
     imageUrl: string;
   
-    @OneToMany(() => Room, theater => theater.cinema)
-    theaters: Room[];
+    @OneToMany(() => Room, room => room.cinema)
+    rooms: Room[];
   }

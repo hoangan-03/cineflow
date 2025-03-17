@@ -85,8 +85,8 @@ export class User extends BaseEntity {
   profileImageUrl: string;
 
   @ApiProperty({
-    example: "https://example.com/profile.jpg",
-    description: "User profile image URL",
+    example: "47 ABC Street, XYZ City",
+    description: "User address",
     required: false,
   })
   @Column({ type: "text", nullable: true })

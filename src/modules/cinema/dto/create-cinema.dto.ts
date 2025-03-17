@@ -1,53 +1,51 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUrl, IsBoolean, IsOptional, IsPhoneNumber } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsPhoneNumber,
+} from "class-validator";
 
 export class CreateCinemaDto {
   @ApiProperty({
-    example: 'Cineworld',
-    description: 'Cinema name',
+    example: "Cineworld",
+    description: "Cinema name",
   })
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  @ApiPropertyOptional({
+    example: "John Alice",
+    description: "Cinema name",
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  owner: string;
+
   @ApiProperty({
-    example: '123 Main Street, Cityville',
-    description: 'Cinema address',
+    example: "123 Main Street, Cityville",
+    description: "Cinema address",
   })
   @IsNotEmpty()
   @IsString()
   address: string;
 
   @ApiProperty({
-    example: '+1234567890',
-    description: 'Cinema phone number',
+    example: "+1234567890",
+    description: "Cinema phone number",
   })
   @IsNotEmpty()
   @IsPhoneNumber()
   phoneNumber: string;
 
-  @ApiProperty({
-    example: 'https://example.com/image.jpg',
-    description: 'Cinema image URL',
-    required: false,
+  @ApiPropertyOptional({
+    example: "https://example.com/image.jpg",
+    description: "Cinema image URL",
+    nullable: true,
   })
   @IsOptional()
-  @IsUrl()
+  @IsString()
   imageUrl?: string;
-
-  @ApiProperty({
-    example: true,
-    description: 'Whether the cinema has parking',
-  })
-  @IsOptional()
-  @IsBoolean()
-  hasParking?: boolean;
-
-  @ApiProperty({
-    example: true,
-    description: 'Whether the cinema has food court',
-  })
-  @IsOptional()
-  @IsBoolean()
-  hasFoodCourt?: boolean;
 }

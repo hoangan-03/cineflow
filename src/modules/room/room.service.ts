@@ -4,14 +4,14 @@ import { Repository } from 'typeorm';
 import { Room } from '@/entities/room.entity';
 import { Seat } from '@/entities/seat.entity';
 import { Cinema } from '@/entities/cinema.entity';
-import { CreateTheaterDto } from './dto/create-theater.dto';
-import { UpdateTheaterDto } from './dto/update-theater.dto';
+import { CreateTheaterDto } from './dto/create-room.dto';
+import { UpdateTheaterDto } from './dto/update-room.dto';
 
 @Injectable()
-export class TheaterService {
+export class RoomService {
   constructor(
     @InjectRepository(Room)
-    private readonly theaterRepository: Repository<Room>,
+    private readonly roomRepository: Repository<Room>,
     
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
@@ -21,20 +21,20 @@ export class TheaterService {
   ) {}
 
   async findAll(): Promise<Room[]> {
-    return this.theaterRepository.find();
+    return this.roomRepository.find();
   }
 
   async findOne(id: string): Promise<Room> {
-    const theater = await this.theaterRepository.findOne({ 
+    const room = await this.roomRepository.findOne({ 
       where: { id },
       relations: ['cinema']
     });
     
-    if (!theater) {
+    if (!room) {
       throw new NotFoundException(`Room with ID ${id} not found`);
     }
     
-    return theater;
+    return room;
   }
 
   async create(createTheaterDto: CreateTheaterDto): Promise<Room> {
@@ -46,16 +46,16 @@ export class TheaterService {
       throw new NotFoundException(`Cinema with ID ${cinema_id} not found`);
     }
     
-    const theater = this.theaterRepository.create({
+    const room = this.roomRepository.create({
       ...theaterData,
       cinema_id
     });
     
-    return this.theaterRepository.save(theater);
+    return this.roomRepository.save(room);
   }
 
   async update(id: string, updateTheaterDto: UpdateTheaterDto): Promise<Room> {
-    const theater = await this.findOne(id);
+    const room = await this.findOne(id);
     
     if (updateTheaterDto.cinema_id) {
       // Verify cinema exists if cinema_id is being updated
@@ -70,22 +70,22 @@ export class TheaterService {
       }
     }
     
-    Object.assign(theater, updateTheaterDto);
-    return this.theaterRepository.save(theater);
+    Object.assign(room, updateTheaterDto);
+    return this.roomRepository.save(room);
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.theaterRepository.delete(id);
+    const result = await this.roomRepository.delete(id);
     
     if (result.affected === 0) {
       throw new NotFoundException(`Room with ID ${id} not found`);
     }
   }
 
-  async findSeats(theaterId: string): Promise<Seat[]> {
-    // First check if theater exists
-    await this.findOne(theaterId);
+  async findSeats(roomId: string): Promise<Seat[]> {
+    // First check if room exists
+    await this.findOne(roomId);
     
-    return this.seatRepository.find({ where: { theater_id: theaterId } });
+    return this.seatRepository.find({ where: { room_id: roomId } });
   }
 }

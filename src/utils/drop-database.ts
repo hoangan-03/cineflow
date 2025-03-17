@@ -26,10 +26,8 @@ const dropDatabase = async () => {
     
     console.log('Dropping database tables...');
     
-    // First drop tables with many-to-many relationships
     await queryRunner.query('DROP TABLE IF EXISTS movie_genres CASCADE');
     
-    // Drop cinema management system tables
     await queryRunner.query('DROP TABLE IF EXISTS booked_seats CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS bookings CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS reviews CASCADE');
@@ -40,13 +38,11 @@ const dropDatabase = async () => {
     await queryRunner.query('DROP TABLE IF EXISTS movies CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS genres CASCADE');
     
-    // Drop user management tables
     await queryRunner.query('DROP TABLE IF EXISTS settings CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS payment_methods CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS user_status CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS users CASCADE');
    
-    // Drop any remaining types
     await queryRunner.query('DROP TYPE IF EXISTS gender_enum CASCADE');
     await queryRunner.query('DROP TYPE IF EXISTS setting_type_enum CASCADE');
     await queryRunner.query('DROP TYPE IF EXISTS payment_method_type_enum CASCADE');

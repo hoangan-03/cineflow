@@ -29,22 +29,22 @@ export class Room extends BaseEntity {
 
   @ApiProperty({
     example: 150,
-    description: "Total seats in theater"
+    description: "Total seats in room"
   })
   @Column({ type: "integer" })
   totalSeats: number;
 
   @ApiProperty({
     type: () => Cinema,
-    description: "The cinema this theater belongs to"
+    description: "The cinema this room belongs to"
   })
-  @ManyToOne(() => Cinema, cinema => cinema.theaters)
+  @ManyToOne(() => Cinema, cinema => cinema.rooms)
   @JoinColumn({ name: "cinema_id" })
   cinema: Cinema;
 
   @Column({ type: "uuid" })
   cinema_id: string;
 
-  @OneToMany(() => Screening, screening => screening.theater)
+  @OneToMany(() => Screening, screening => screening.room)
   screenings: Screening[];
 }

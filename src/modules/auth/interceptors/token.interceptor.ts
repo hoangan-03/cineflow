@@ -27,7 +27,7 @@ export class TokenInterceptor implements NestInterceptor {
         
         let user: User;
         
-        // If it's a response with 'data' property like AuthTokenResponseDto
+        // If it's a response like AuthTokenResponseDto
         if (data.data && data.data.access_token) {
           // For login endpoint which directly returns tokens
           response.setHeader('Authorization', `Bearer ${data.data.access_token}`);

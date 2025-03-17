@@ -68,18 +68,4 @@ export class UserService {
     user.profileImageUrl = imageUrl;
     return this.userRepository.save(user);
   }
-
-  // Payment Methods
-  // async addPaymentMethod(
-  //   userId: string,
-  //   paymentMethod: Partial<PaymentMethods>
-  // ): Promise<PaymentMethods> {
-  //   const newPaymentMethod = this.paymentMethodRepository.create({
-  //     ...paymentMethod,
-  //     userId: userId,
-  //   });
-  //   return this.paymentMethodRepository.save(newPaymentMethod);
-  // }
-
-  // User Status
 }

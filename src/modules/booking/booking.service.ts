@@ -39,7 +39,7 @@ export class BookingService {
       relations: [
         "screening",
         "screening.movie",
-        "screening.theater",
+        "screening.room",
         "bookedSeats",
         "bookedSeats.seat",
       ],
@@ -53,7 +53,7 @@ export class BookingService {
       relations: [
         "screening",
         "screening.movie",
-        "screening.theater",
+        "screening.room",
         "bookedSeats",
         "bookedSeats.seat",
       ],
@@ -160,7 +160,6 @@ export class BookingService {
   ): Promise<Booking> {
     const booking = await this.findOneByUser(id, userId);
 
-    // Only allow status updates
     if (updateBookingDto.status) {
       if (
         booking.status === BookingStatus.CANCELLED ||
@@ -171,7 +170,6 @@ export class BookingService {
         );
       }
 
-      // Only allow certain status transitions
       const allowedTransitions = {
         [BookingStatus.PENDING]: [
           BookingStatus.CONFIRMED,
@@ -196,7 +194,6 @@ export class BookingService {
       return this.bookingRepository.save(booking);
     }
 
-    // For other updates, throw error if not PENDING
     if (booking.status !== BookingStatus.PENDING) {
       throw new BadRequestException(
         `Cannot update a booking with status ${booking.status}`
@@ -217,7 +214,7 @@ export class BookingService {
     }
 
     // Only allow cancellation for PENDING and CONFIRMED statuses
-    // For PAID status, it should be REFUNDED instead of CANCELLED
+    // For PAID status, REFUNDED instead of CANCELLED
     if (
       booking.status === BookingStatus.PENDING ||
       booking.status === BookingStatus.CONFIRMED
@@ -239,7 +236,7 @@ export class BookingService {
       relations: [
         "screening",
         "screening.movie",
-        "screening.theater",
+        "screening.room",
         "bookedSeats",
         "bookedSeats.seat",
         "user",
@@ -254,7 +251,7 @@ export class BookingService {
       relations: [
         "screening",
         "screening.movie",
-        "screening.theater",
+        "screening.room",
         "bookedSeats",
         "bookedSeats.seat",
         "user",

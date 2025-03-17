@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CinemaService } from './cinema.service';
 import { Cinema } from '@/entities/cinema.entity';
 import { CreateCinemaDto } from './dto/create-cinema.dto';
 import { UpdateCinemaDto } from './dto/update-cinema.dto';
+import { JWTAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Public } from '../auth/decorators/public.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@/modules/auth/enums/role.enum';
 
 @ApiTags('cinemas')
+@UseGuards(JWTAuthGuard, RolesGuard)
 @Controller('cinemas')
 export class CinemaController {
   constructor(private readonly cinemaService: CinemaService) {}
 
+  // Public
+  @Public()
   @Get()
   @ApiOperation({ summary: 'Get all cinemas' })
   @ApiResponse({ status: 200, description: 'Return all cinemas', type: [Cinema] })
@@ -17,6 +25,7 @@ export class CinemaController {
     return this.cinemaService.findAll();
   }
 
+  @Public()
   @Get(':id')
   @ApiOperation({ summary: 'Get cinema by ID' })
   @ApiResponse({ status: 200, description: 'Return cinema by ID', type: Cinema })
@@ -25,7 +34,27 @@ export class CinemaController {
     return this.cinemaService.findOne(id);
   }
 
+  @Public()
+  @Get(':id/rooms')
+  @ApiOperation({ summary: 'Get all rooms in a cinema' })
+  @ApiResponse({ status: 200, description: 'Return all rooms in a cinema' })
+  @ApiResponse({ status: 404, description: 'Cinema not found' })
+  async findRooms(@Param('id') id: string) {
+    return this.cinemaService.findRooms(id);
+  }
+
+  @Public()
+  @Get(':id/screenings')
+  @ApiOperation({ summary: 'Get all screenings in a cinema' })
+  @ApiResponse({ status: 200, description: 'Return all screenings in a cinema' })
+  @ApiResponse({ status: 404, description: 'Cinema not found' })
+  async findscreenings(@Param('id') id: string) {
+    return this.cinemaService.findscreenings(id);
+  }
+
+  // Staff
   @Post()
+  @Roles(Role.STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new cinema' })
   @ApiResponse({ status: 201, description: 'Cinema created successfully', type: Cinema })
@@ -34,6 +63,7 @@ export class CinemaController {
   }
 
   @Put(':id')
+  @Roles(Role.STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a cinema' })
   @ApiResponse({ status: 200, description: 'Cinema updated successfully', type: Cinema })
@@ -46,6 +76,7 @@ export class CinemaController {
   }
 
   @Delete(':id')
+  @Roles(Role.STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a cinema' })
   @ApiResponse({ status: 200, description: 'Cinema deleted successfully' })
@@ -54,11 +85,13 @@ export class CinemaController {
     return this.cinemaService.remove(id);
   }
 
-  @Get(':id/theaters')
-  @ApiOperation({ summary: 'Get all theaters in a cinema' })
-  @ApiResponse({ status: 200, description: 'Return all theaters in a cinema' })
+  @Get(':id/stats')
+  @Roles(Role.STAFF)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get cinema statistics' })
+  @ApiResponse({ status: 200, description: 'Return cinema statistics' })
   @ApiResponse({ status: 404, description: 'Cinema not found' })
-  async findTheaters(@Param('id') id: string) {
-    return this.cinemaService.findTheaters(id);
+  async getStatistics(@Param('id') id: string) {
+    return this.cinemaService.getStatistics(id);
   }
 }

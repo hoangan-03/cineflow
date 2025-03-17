@@ -8,13 +8,6 @@ export class TokenDataDto {
   access_token: string;
 
   @ApiProperty({
-    example: 60 * 60,
-    description: "Token expiration time in seconds",
-    type: Number,
-  })
-  expires_in: number;
-// no need
-  @ApiProperty({
     example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     description: "JWT refresh token",
   })

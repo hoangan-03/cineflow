@@ -10,10 +10,9 @@ import { RegisterUserDto } from "@/modules/auth/dto/register-user.dto";
 import { JwtPayload } from "@/modules/auth/interfaces/jwt-payload.interface";
 import { UserService } from "@/modules/user/services/user.service";
 import { AuthTokenResponseDto } from "@/modules/auth/dto/auth-token-response.dto";
-import { RegisterUserResponseDto as RegisterUserResponseDto } from "@/modules/auth/dto/register-user-response.dto";
 import { AuthConstant } from "@/modules/auth/constant";
-import { BeforeInsert, BeforeUpdate } from "typeorm";
 import * as bcrypt from "bcryptjs";
+import { Response } from "express";
 
 @Injectable()
 export class AuthService {
@@ -93,10 +92,14 @@ export class AuthService {
     return {
       data: {
         access_token,
-        expires_in: AuthConstant.ACCESS_TOKEN_EXPIRATION,
         refresh_token,
       },
     };
+  }
+
+  getUserProfile(user: User): User {
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword as User;
   }
 
   async verifyPayload(payload: JwtPayload): Promise<User> {
@@ -115,23 +118,19 @@ export class AuthService {
     return user;
   }
 
-  // async signToken(user: User | any): Promise<string> {
-  //   if (!user) {
-  //     throw new UnauthorizedException("Invalid user data: Missing user object");
-  //   }
+  logout(response: Response): { message: string } {
+    // Clear authentication cookies
+    response.clearCookie("token", {
+      httpOnly: true,
+      signed: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+    });
 
-  //   if (user.id === undefined || user.id === null) {
-  //     throw new UnauthorizedException("Invalid user data: Missing user ID");
-  //   }
+    // Remove the authorization header
+    response.removeHeader("Authorization");
 
-  //   const payload: JwtPayload = {
-  //     sub: user.id.toString(),
-  //     email: user.email || "",
-  //     username: user.username || "",
-  //     iat: Date.now(),
-  //     exp: Date.now() + 1000 * 60 * 60 * 24 * 7, // 7 days
-  //   };
+    return { message: "Logged out successfully" };
+  }
 
-  //   return this.jwtService.sign(payload);
-  // }
 }

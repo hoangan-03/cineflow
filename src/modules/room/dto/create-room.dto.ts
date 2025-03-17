@@ -1,26 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsInt, IsBoolean, IsOptional, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsInt, IsBoolean, IsOptional, IsUUID } from 'class-validator';
 
-export class UpdateTheaterDto {
+export class CreateTheaterDto {
   @ApiProperty({
     example: 'Room 1',
     description: 'Room name/number',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  name?: string;
+  name: string;
 
   @ApiProperty({
     example: 150,
-    description: 'Total seats in theater',
+    description: 'Total seats in room',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsInt()
-  totalSeats?: number;
+  totalSeats: number;
 
   @ApiProperty({
     example: true,
-    description: 'Whether the theater supports 3D',
+    description: 'Whether the room supports 3D',
   })
   @IsOptional()
   @IsBoolean()
@@ -28,7 +28,7 @@ export class UpdateTheaterDto {
 
   @ApiProperty({
     example: true,
-    description: 'Whether the theater has IMAX',
+    description: 'Whether the room has IMAX',
   })
   @IsOptional()
   @IsBoolean()
@@ -36,9 +36,9 @@ export class UpdateTheaterDto {
 
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'ID of the cinema this theater belongs to',
+    description: 'ID of the cinema this room belongs to',
   })
-  @IsOptional()
+  @IsNotEmpty()
   @IsUUID(4)
-  cinema_id?: string;
+  cinema_id: string;
 }

@@ -46,7 +46,7 @@ export class UpdateScreeningDto {
 
   @ApiProperty({
     example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'ID of the theater where the screening takes place',
+    description: 'ID of the room where the screening takes place',
   })
   @IsOptional()
   @IsUUID(4)

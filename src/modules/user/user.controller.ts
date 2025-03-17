@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger";
 import { User } from "@/entities/user.entity";
 import { UserService } from "@/modules/user/services/user.service";
 import { UpdateUserDto } from "@/modules/user/dto/update-user.dto";
-import { SettingType } from "@/modules/user/enums/setting.enum";
+
 
 @ApiTags("users")
 @Controller("users")

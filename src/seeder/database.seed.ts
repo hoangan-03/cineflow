@@ -343,20 +343,20 @@ export const seedDatabase = async (
         cinema_id: cinema.id,
       };
 
-      const theater = theaterRepository.create(theaterData);
-      await theaterRepository.save(theater);
-      theaters.push(theater);
+      const room = theaterRepository.create(theaterData);
+      await theaterRepository.save(room);
+      theaters.push(room);
     }
   }
   console.log(`✅ Created ${theaters.length} theaters across all cinemas`);
 
-  // 7. Seed seats for each theater
+  // 7. Seed seats for each room
   console.log("💺 Seeding seats...");
   const seats: Seat[] = [];
 
-  for (const theater of theaters) {
+  for (const room of theaters) {
     const rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    const seatsPerRow = Math.floor(theater.totalSeats / rows.length);
+    const seatsPerRow = Math.floor(room.totalSeats / rows.length);
 
     for (const row of rows) {
       for (let seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
@@ -372,7 +372,7 @@ export const seedDatabase = async (
           row: row,
           number: seatNum,
           type: seatType,
-          theater_id: theater.id,
+          theater_id: room.id,
         };
 
         const seat = seatRepository.create(seatData);
@@ -383,7 +383,7 @@ export const seedDatabase = async (
   }
   console.log(`✅ Created ${seats.length} seats across all theaters`);
 
-  // 8. Seed screenings (multiple per theater for different movies)
+  // 8. Seed screenings (multiple per room for different movies)
   console.log("🎞️ Seeding movie screenings...");
   const screenings: Screening[] = [];
 
@@ -392,8 +392,8 @@ export const seedDatabase = async (
     const screeningDate = new Date();
     screeningDate.setDate(screeningDate.getDate() + day);
 
-    for (const theater of theaters) {
-      // Each theater shows 3-4 movies per day
+    for (const room of theaters) {
+      // Each room shows 3-4 movies per day
       const moviesPerDay = faker.number.int({ min: 3, max: 4 });
       const selectedMovies = faker.helpers.arrayElements(movies, moviesPerDay);
 
@@ -416,7 +416,7 @@ export const seedDatabase = async (
           price: price,
           isAvailable: true,
           movie_id: movie.id,
-          theater_id: theater.id,
+          theater_id: room.id,
         };
 
         const screening = screeningRepository.create(screeningData);
@@ -462,7 +462,7 @@ export const seedDatabase = async (
     const bookingUsers = faker.helpers.arrayElements(users, bookingUsersCount);
 
     for (const user of bookingUsers) {
-      // Get available seats for this theater
+      // Get available seats for this room
       const availableSeats = await seatRepository.find({
         where: { theater_id: screening.theater_id },
       });

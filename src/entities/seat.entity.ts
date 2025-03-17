@@ -43,7 +43,7 @@ export class Seat extends BaseEntity {
 
   @ApiProperty({
     type: () => Room,
-    description: "The theater this seat belongs to",
+    description: "The room this seat belongs to",
   })
   @ManyToOne(() => Room)
   @JoinColumn({ name: "room_id" })
