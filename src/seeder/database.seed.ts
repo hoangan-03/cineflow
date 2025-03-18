@@ -1,515 +1,335 @@
-// import { DataSource } from "typeorm";
-// import { faker } from "@faker-js/faker";
-// import { User } from "@/entities/user.entity";
-// import { Gender } from "@/modules/user/enums/gender.enum";
-// import { PaymentMethodType } from "@/modules/user/enums/payment-method.enum";
-// import { Movie } from "@/entities/movie.entity";
-// import { Cinema } from "@/entities/cinema.entity";
-// import { Room } from "@/entities/room.entity";
-// import { Seat } from "@/entities/seat.entity";
-// import { Screening } from "@/entities/screening.entity";
-// import { Booking } from "@/entities/booking.entity";
-// import { BookedSeat } from "@/entities/booked-seat.entity";
-// import { Review } from "@/entities/review.entity";
-// import { Genre } from "@/entities/genre.entity";
-// import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
-// import { Role } from "@/modules/auth/enums/role.enum";
-// // Sample data
-// const movieGenres = [
-//   "Action",
-//   "Adventure",
-//   "Animation",
-//   "Comedy",
-//   "Crime",
-//   "Documentary",
-//   "Drama",
-//   "Fantasy",
-//   "Horror",
-//   "Mystery",
-//   "Romance",
-//   "Sci-Fi",
-//   "Thriller",
-//   "Western",
-// ];
-// const movieData = [
-//   {
-//     title: "Inception",
-//     description:
-//       "A thief who steals corporate secrets through dream-sharing technology is given the task of planting an idea into the mind of a CEO.",
-//     director: "Christopher Nolan",
-//     durationMinutes: 148,
-//     releaseDate: new Date("2010-07-16"),
-//     posterUrl: "https://example.com/inception_poster.jpg",
-//     trailerUrl: "https://example.com/inception_trailer.mp4",
-//     cast: [
-//       "Leonardo DiCaprio",
-//       "Joseph Gordon-Levitt",
-//       "Elliot Page",
-//       "Tom Hardy",
-//       "Ken Watanabe",
-//       "Marion Cotillard"
-//     ],
-//     genreNames: ["Action", "Sci-Fi", "Thriller"],
-//   },
-//   {
-//     title: "The Shawshank Redemption",
-//     description:
-//       "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
-//     director: "Frank Darabont",
-//     durationMinutes: 142,
-//     releaseDate: new Date("1994-09-23"),
-//     posterUrl: "https://example.com/shawshank_poster.jpg",
-//     trailerUrl: "https://example.com/shawshank_trailer.mp4",
-//     cast: [
-//       "Tim Robbins",
-//       "Morgan Freeman",
-//       "Bob Gunton",
-//       "William Sadler",
-//       "Clancy Brown",
-//       "Gil Bellows"
-//     ],
-//     genreNames: ["Drama"],
-//   },
-//   {
-//     title: "The Godfather",
-//     description:
-//       "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
-//     director: "Francis Ford Coppola",
-//     durationMinutes: 175,
-//     releaseDate: new Date("1972-03-24"),
-//     posterUrl: "https://example.com/godfather_poster.jpg",
-//     trailerUrl: "https://example.com/godfather_trailer.mp4",
-//     cast: [
-//       "Marlon Brando",
-//       "Al Pacino",
-//       "James Caan",
-//       "Robert Duvall",
-//       "Diane Keaton",
-//       "Talia Shire"
-//     ],
-//     genreNames: ["Crime", "Drama"],
-//   },
-//   {
-//     title: "Pulp Fiction",
-//     description:
-//       "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
-//     director: "Quentin Tarantino",
-//     durationMinutes: 154,
-//     releaseDate: new Date("1994-10-14"),
-//     posterUrl: "https://example.com/pulpfiction_poster.jpg",
-//     trailerUrl: "https://example.com/pulpfiction_trailer.mp4",
-//     cast: [
-//       "John Travolta",
-//       "Samuel L. Jackson",
-//       "Uma Thurman",
-//       "Bruce Willis",
-//       "Ving Rhames",
-//       "Tim Roth"
-//     ],
-//     genreNames: ["Crime", "Drama"],
-//   },
-//   {
-//     title: "Forrest Gump",
-//     description:
-//       "The presidencies of Kennedy and Johnson, the Vietnam War, the Watergate scandal and other historical events unfold from the perspective of an Alabama man with an IQ of 75.",
-//     director: "Robert Zemeckis",
-//     durationMinutes: 142,
-//     releaseDate: new Date("1994-07-06"),
-//     posterUrl: "https://example.com/forrestgump_poster.jpg",
-//     trailerUrl: "https://example.com/forrestgump_trailer.mp4",
-//     cast: [
-//       "Tom Hanks",
-//       "Robin Wright",
-//       "Gary Sinise",
-//       "Sally Field",
-//       "Mykelti Williamson",
-//       "Rebecca Williams"
-//     ],
-//     genreNames: ["Drama", "Romance"],
-//   },
-//   {
-//     title: "The Dark Knight",
-//     description:
-//       "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-//     director: "Christopher Nolan",
-//     durationMinutes: 152,
-//     releaseDate: new Date("2008-07-18"),
-//     posterUrl: "https://example.com/darkknight_poster.jpg",
-//     trailerUrl: "https://example.com/darkknight_trailer.mp4",
-//     cast: [
-//       "Christian Bale",
-//       "Heath Ledger",
-//       "Aaron Eckhart",
-//       "Michael Caine",
-//       "Gary Oldman",
-//       "Morgan Freeman"
-//     ],
-//     genreNames: ["Action", "Crime", "Drama"],
-//   },
-// ];
+import { DataSource } from "typeorm";
+import { faker } from "@faker-js/faker";
+import { User } from "@/entities/user.entity";
+import { Gender } from "@/modules/user/enums/gender.enum";
+import { Movie } from "@/entities/movie.entity";
+import { Cinema } from "@/entities/cinema.entity";
+import { Room } from "@/entities/room.entity";
+import { Seat } from "@/entities/seat.entity";
+import { Screening } from "@/entities/screening.entity";
+import { Booking } from "@/entities/booking.entity";
+import { BookedSeat } from "@/entities/booked-seat.entity";
+import { Review } from "@/entities/review.entity";
+import { Genre } from "@/entities/genre.entity";
+import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
+import { Role } from "@/modules/auth/enums/role.enum";
+import { cinemaData, movieData, movieGenres } from "./sample-data";
 
-// const cinemaData = [
-//   {
-//     name: "Cineworld Downtown",
-//     owner: "John Smith",
-//     address: "123 Main Street, Downtown, NY 10001",
-//     phoneNumber: "+1234567890",
-//     imageUrl: "https://example.com/cineworld_downtown.jpg",
-//   },
-//   {
-//     name: "Starlight Cinema",
-//     owner: "Emma Johnson",
-//     address: "456 Broadway, West End, NY 10002",
-//     phoneNumber: "+1234567891",
-//     imageUrl: "https://example.com/starlight.jpg",
-//   },
-//   {
-//     name: "Landmark Theaters",
-//     owner: "David Williams",
-//     address: "789 Oak Avenue, East Side, NY 10003",
-//     phoneNumber: "+1234567892",
-//     imageUrl: "https://example.com/landmark.jpg",
-//   },
-//   {
-//     name: "Regal Cinemas",
-//     owner: "Sarah Brown",
-//     address: "101 Pine Street, North Side, NY 10004",
-//     phoneNumber: "+1234567893",
-//     imageUrl: "https://example.com/regal.jpg",
-//   },
-//   {
-//     name: "AMC Theaters",
-//     owner: "Michael Davis",
-//     address: "202 Maple Road, South Side, NY 10005",
-//     phoneNumber: "+1234567894",
-//     imageUrl: "https://example.com/amc.jpg",
-//   },
-// ];
 
-// const createFakeUser = () => {
-//   const gender = faker.helpers.arrayElement([
-//     Gender.MALE,
-//     Gender.FEMALE,
-//     Gender.OTHER,
-//   ]) as Gender;
-//   const genderParam =
-//     gender === Gender.OTHER
-//       ? undefined
-//       : (gender.toLowerCase() as "male" | "female");
-//   const firstName = faker.person.firstName(genderParam);
-//   const lastName = faker.person.lastName();
+const createFakeUser = () => {
+  const gender = faker.helpers.arrayElement([
+    Gender.MALE,
+    Gender.FEMALE,
+    Gender.OTHER,
+  ]) as Gender;
+  const genderParam =
+    gender === Gender.OTHER
+      ? undefined
+      : (gender.toLowerCase() as "male" | "female");
+  const firstName = faker.person.firstName(genderParam);
+  const lastName = faker.person.lastName();
 
-//   return {
-//     email: faker.internet.email({ firstName, lastName }),
-//     username: faker.internet.username({ firstName, lastName }),
-//     password: faker.internet.password(),
-//     phoneNumber: faker.phone.number({ style: "national" }),
-//     dob: faker.date.birthdate(),
-//     gender,
-//     firstName,
-//     lastName,
-//     profileImageUrl: faker.image.avatar(),
-//     coverImageUrl: faker.image.url(),
-//     address: faker.location.streetAddress(),
-//     role: faker.helpers.arrayElement(Object.values(Role)),
-//   };
-// };
+  return {
+    email: faker.internet.email({ firstName, lastName }),
+    username: faker.internet.username({ firstName, lastName }),
+    password: faker.internet.password(),
+    phoneNumber: faker.phone.number({ style: "national" }),
+    dob: faker.date.birthdate(),
+    gender,
+    profileImageUrl: faker.image.avatar(),
+    address: faker.location.streetAddress(),
+    role: faker.helpers.arrayElement(Object.values(Role)),
+  };
+};
 
-// const createFakeReview = (userId: string, movieId: string) => {
-//   return {
-//     user_id: userId,
-//     movie_id: movieId,
-//     title: faker.lorem.sentence(5),
-//     content: faker.lorem.paragraphs(2),
-//     rating: parseFloat(
-//       faker.number.float({ min: 1, max: 5, fractionDigits: 1 }).toFixed(1)
-//     ),
-//     containsSpoilers: faker.datatype.boolean(),
-//   };
-// };
+const createFakeReview = (userId: string, movieId: string) => {
+  return {
+    user_id: userId,
+    movie_id: movieId,
+    content: faker.lorem.paragraphs(2),
+    rating: parseFloat(
+      faker.number.float({ min: 1, max: 5, fractionDigits: 1 }).toFixed(1)
+    ),
+    timeStamp: faker.date.recent(),
+    isEdited: faker.datatype.boolean(),
+  };
+};
 
-// // Seeding function
-// export const seedDatabase = async (
-//   dataSource: DataSource,
-//   userCount: number
-// ) => {
-//   console.log("🌱 Starting database seeding process...");
+// Seeding function
+export const seedDatabase = async (
+  dataSource: DataSource,
+  userCount: number
+) => {
+  console.log("🌱 Starting database seeding process...");
 
-//   // Get all repositories
-//   const userRepository = dataSource.getRepository(User);
-//   const genreRepository = dataSource.getRepository(Genre);
-//   const movieRepository = dataSource.getRepository(Movie);
-//   const cinemaRepository = dataSource.getRepository(Cinema);
-//   const theaterRepository = dataSource.getRepository(Room);
-//   const seatRepository = dataSource.getRepository(Seat);
-//   const screeningRepository = dataSource.getRepository(Screening);
-//   const bookingRepository = dataSource.getRepository(Booking);
-//   const bookedSeatRepository = dataSource.getRepository(BookedSeat);
-//   const reviewRepository = dataSource.getRepository(Review);
+  // Get all repositories
+  const userRepository = dataSource.getRepository(User);
+  const genreRepository = dataSource.getRepository(Genre);
+  const movieRepository = dataSource.getRepository(Movie);
+  const cinemaRepository = dataSource.getRepository(Cinema);
+  const roomRepository = dataSource.getRepository(Room);
+  const seatRepository = dataSource.getRepository(Seat);
+  const screeningRepository = dataSource.getRepository(Screening);
+  const bookingRepository = dataSource.getRepository(Booking);
+  const bookedSeatRepository = dataSource.getRepository(BookedSeat);
+  const reviewRepository = dataSource.getRepository(Review);
 
-//   // Clear all data using raw queries to handle foreign key constraints
-//   console.log("🧹 Clearing existing data...");
+  // Clear all data using raw queries to handle foreign key constraints
+  console.log("🧹 Clearing existing data...");
 
-//   // Use a transaction for the delete operations
-//   await dataSource.transaction(async (manager) => {
-//     // Delete in proper order
-//     await manager.query('DELETE FROM "booked_seats"');
-//     await manager.query('DELETE FROM "bookings"');
-//     await manager.query('DELETE FROM "reviews"');
-//     await manager.query('DELETE FROM "screenings"');
-//     await manager.query('DELETE FROM "seats"');
-//     await manager.query('DELETE FROM "rooms"');
-//     await manager.query('DELETE FROM "cinemas"');
+  // Use a transaction for the delete operations
+  await dataSource.transaction(async (manager) => {
+    await manager.query('DELETE FROM "booked_seats"');
+    await manager.query('DELETE FROM "bookings"');
+    await manager.query('DELETE FROM "reviews"');
+    await manager.query('DELETE FROM "screenings"');
+    await manager.query('DELETE FROM "seats"');
+    await manager.query('DELETE FROM "rooms"');
+    await manager.query('DELETE FROM "cinemas"');
+    await manager.query('DELETE FROM "movie_genres"');
+    await manager.query('DELETE FROM "movies"');
+    await manager.query('DELETE FROM "genres"');
+    await manager.query('DELETE FROM "users"');
+  });
 
-//     // Handle many-to-many relationship for movies and genres
-//     await manager.query('DELETE FROM "movie_genres"');
-//     await manager.query('DELETE FROM "movies"');
-//     await manager.query('DELETE FROM "genres"');
+  // Seed users
+  console.log(`👤 Seeding ${userCount} users...`);
+  const users: User[] = [];
 
-//     await manager.query('DELETE FROM "users"');
-//   });
+  for (let i = 0; i < userCount; i++) {
+    const userData = createFakeUser();
+    const user = userRepository.create(userData);
+    await userRepository.save(user);
+    users.push(user);
+  }
+  console.log(`✅ Created ${users.length} users`);
 
-//   // Seed users
-//   console.log(`Seeding ${userCount} users...`);
-//   const users: User[] = [];
+  // Seed genres
+  console.log("🎭 Seeding movie genres...");
+  const genres: Genre[] = [];
 
-//   for (let i = 0; i < userCount; i++) {
-//     const userData = createFakeUser();
+  for (const genreName of movieGenres) {
+    const genre = genreRepository.create({ name: genreName });
+    await genreRepository.save(genre);
+    genres.push(genre);
+  }
+  console.log(`✅ Created ${genres.length} movie genres`);
 
-//     // Create user
-//     const user = userRepository.create(userData);
-//     await userRepository.save(user);
-//     users.push(user);
-//   }
-//   console.log(`✅ Created ${users.length} users`);
+  // Seed movies with genres
+  console.log("🎬 Seeding movies...");
+  const movies: Movie[] = [];
 
-//   // Seed genres
-//   console.log("🎭 Seeding movie genres...");
-//   const genres: Genre[] = [];
+  for (const movie of movieData) {
+    const { genreNames, ...movieInfo } = movie;
+    const movieEntity = movieRepository.create(movieInfo);
 
-//   for (const genreName of movieGenres) {
-//     const genre = genreRepository.create({ name: genreName });
-//     await genreRepository.save(genre);
-//     genres.push(genre);
-//   }
-//   console.log(`✅ Created ${genres.length} movie genres`);
+    // Add genres
+    movieEntity.genres = [];
+    for (const genreName of genreNames) {
+      const genre = genres.find((g) => g.name === genreName);
+      if (genre) {
+        movieEntity.genres.push(genre);
+      }
+    }
 
-//   // Seed movies with genres
-//   console.log("🎬 Seeding movies...");
-//   const movies: Movie[] = [];
+    await movieRepository.save(movieEntity);
+    movies.push(movieEntity);
+  }
+  console.log(`✅ Created ${movies.length} movies with genres`);
 
-//   for (const movie of movieData) {
-//     const { genreNames, ...movieInfo } = movie;
-//     const movieEntity = movieRepository.create(movieInfo);
+  // Seed cinemas
+  console.log("🏢 Seeding cinemas...");
+  const cinemas: Cinema[] = [];
 
-//     // Add genres
-//     movieEntity.genres = [];
-//     for (const genreName of genreNames) {
-//       const genre = genres.find((g) => g.name === genreName);
-//       if (genre) {
-//         movieEntity.genres.push(genre);
-//       }
-//     }
+  for (const cinema of cinemaData) {
+    const cinemaEntity = cinemaRepository.create(cinema);
+    await cinemaRepository.save(cinemaEntity);
+    cinemas.push(cinemaEntity);
+  }
+  console.log(`✅ Created ${cinemas.length} cinemas`);
 
-//     await movieRepository.save(movieEntity);
-//     movies.push(movieEntity);
-//   }
-//   console.log(`✅ Created ${movies.length} movies with genres`);
+  // Seed rooms (2-4 per cinema)
+  console.log("🎦 Seeding rooms...");
+  const rooms: Room[] = [];
 
-//   // Seed cinemas
-//   console.log("🏢 Seeding cinemas...");
-//   const cinemas: Cinema[] = [];
+  for (const cinema of cinemas) {
+    const roomCount = faker.number.int({ min: 2, max: 4 });
 
-//   for (const cinema of cinemaData) {
-//     const cinemaEntity = cinemaRepository.create(cinema);
-//     await cinemaRepository.save(cinemaEntity);
-//     cinemas.push(cinemaEntity);
-//   }
-//   console.log(`✅ Created ${cinemas.length} cinemas`);
+    for (let i = 1; i <= roomCount; i++) {
+      const roomData = {
+        name: `Room ${i}`,
+        totalSeats: faker.number.int({ min: 50, max: 200 }),
+        cinema_id: cinema.id,
+      };
 
-//   // Seed theaters (2-4 per cinema)
-//   console.log("🎦 Seeding theaters...");
-//   const theaters: Room[] = [];
+      const room = roomRepository.create(roomData);
+      await roomRepository.save(room);
+      rooms.push(room);
+    }
+  }
+  console.log(`✅ Created ${rooms.length} rooms across all cinemas`);
 
-//   for (const cinema of cinemas) {
-//     const theaterCount = faker.number.int({ min: 2, max: 4 });
+  // Seed seats for each room
+  console.log("💺 Seeding seats...");
+  const seats: Seat[] = [];
 
-//     for (let i = 1; i <= theaterCount; i++) {
-//       const theaterData = {
-//         name: `Room ${i}`,
-//         totalSeats: faker.number.int({ min: 50, max: 200 }),
-//         has3D: faker.datatype.boolean(),
-//         hasIMAX: faker.datatype.boolean(),
-//         cinema_id: cinema.id,
-//       };
+  for (const room of rooms) {
+    const rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    const seatsPerRow = Math.floor(room.totalSeats / rows.length);
 
-//       const room = theaterRepository.create(theaterData);
-//       await theaterRepository.save(room);
-//       theaters.push(room);
-//     }
-//   }
-//   console.log(`✅ Created ${theaters.length} theaters across all cinemas`);
+    for (const row of rows) {
+      for (let seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
+        // Determine seat type
+        let seatType = "standard";
+        if (row === "A" || row === "B") {
+          seatType = "vip";
+        } else if (seatNum === 1 || seatNum === seatsPerRow) {
+          seatType = "accessible";
+        }
 
-//   // 7. Seed seats for each room
-//   console.log("💺 Seeding seats...");
-//   const seats: Seat[] = [];
+        const seatData = {
+          row: row,
+          number: seatNum,
+          type: seatType,
+          room_id: room.id,
+        };
 
-//   for (const room of theaters) {
-//     const rows = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-//     const seatsPerRow = Math.floor(room.totalSeats / rows.length);
+        const seat = seatRepository.create(seatData);
+        await seatRepository.save(seat);
+        seats.push(seat);
+      }
+    }
+  }
+  console.log(`✅ Created ${seats.length} seats across all rooms`);
 
-//     for (const row of rows) {
-//       for (let seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
-//         // Determine seat type
-//         let seatType = "standard";
-//         if (row === "A" || row === "B") {
-//           seatType = "vip";
-//         } else if (seatNum === 1 || seatNum === seatsPerRow) {
-//           seatType = "accessible";
-//         }
+  // Seed screenings (multiple per room for different movies)
+  console.log("🎞️ Seeding movie screenings...");
+  const screenings: Screening[] = [];
 
-//         const seatData = {
-//           row: row,
-//           number: seatNum,
-//           type: seatType,
-//           theater_id: room.id,
-//         };
+  // Create screenings for the next 7 days
+  for (let day = 0; day < 7; day++) {
+    const screeningDate = new Date();
+    screeningDate.setDate(screeningDate.getDate() + day);
 
-//         const seat = seatRepository.create(seatData);
-//         await seatRepository.save(seat);
-//         seats.push(seat);
-//       }
-//     }
-//   }
-//   console.log(`✅ Created ${seats.length} seats across all theaters`);
+    for (const room of rooms) {
+      // Each room shows 3-4 movies per day
+      const moviesPerDay = faker.number.int({ min: 3, max: 4 });
+      const selectedMovies = faker.helpers.arrayElements(movies, moviesPerDay);
 
-//   // 8. Seed screenings (multiple per room for different movies)
-//   console.log("🎞️ Seeding movie screenings...");
-//   const screenings: Screening[] = [];
+      for (let i = 0; i < selectedMovies.length; i++) {
+        const movie = selectedMovies[i];
 
-//   // Create screenings for the next 7 days
-//   for (let day = 0; day < 7; day++) {
-//     const screeningDate = new Date();
-//     screeningDate.setDate(screeningDate.getDate() + day);
+        // Create screening times throughout the day
+        const startHour = 10 + i * 3; // Starting at 10 AM with 3 hours between screenings
+        const screeningDateTime = new Date(screeningDate);
+        screeningDateTime.setHours(startHour, 0, 0, 0);
+        const formats = ["2D", "3D", "IMAX"];
+        const format = faker.helpers.arrayElement(formats);
+        let price = 12.99;
+        if (format === "3D") price = 14.99;
+        if (format === "IMAX") price = 16.99;
 
-//     for (const room of theaters) {
-//       // Each room shows 3-4 movies per day
-//       const moviesPerDay = faker.number.int({ min: 3, max: 4 });
-//       const selectedMovies = faker.helpers.arrayElements(movies, moviesPerDay);
+        const screeningData = {
+          startTime: screeningDateTime,
+          format: format,
+          price: price,
+          isAvailable: true,
+          movie_id: movie.id,
+          room_id: room.id,
+        };
 
-//       for (let i = 0; i < selectedMovies.length; i++) {
-//         const movie = selectedMovies[i];
+        const screening = screeningRepository.create(screeningData);
+        await screeningRepository.save(screening);
+        screenings.push(screening);
+      }
+    }
+  }
+  console.log(`✅ Created ${screenings.length} screenings`);
 
-//         // Create screening times throughout the day
-//         const startHour = 10 + i * 3; // Starting at 10 AM with 3 hours between screenings
-//         const screeningDateTime = new Date(screeningDate);
-//         screeningDateTime.setHours(startHour, 0, 0, 0);
-//         const formats = ["2D", "3D", "IMAX"];
-//         const format = faker.helpers.arrayElement(formats);
-//         let price = 12.99;
-//         if (format === "3D") price = 14.99;
-//         if (format === "IMAX") price = 16.99;
+  // Seed reviews
+  console.log("✍️ Seeding movie reviews...");
+  const reviews: Review[] = [];
 
-//         const screeningData = {
-//           startTime: screeningDateTime,
-//           format: format,
-//           price: price,
-//           isAvailable: true,
-//           movie_id: movie.id,
-//           theater_id: room.id,
-//         };
+  // Create ~3 reviews per movie
+  for (const movie of movies) {
+    const reviewCount = faker.number.int({ min: 2, max: 5 });
+    const reviewers = faker.helpers.arrayElements(users, reviewCount);
 
-//         const screening = screeningRepository.create(screeningData);
-//         await screeningRepository.save(screening);
-//         screenings.push(screening);
-//       }
-//     }
-//   }
-//   console.log(`✅ Created ${screenings.length} screenings`);
+    for (const user of reviewers) {
+      const reviewData = createFakeReview(user.id, movie.id);
+      const review = reviewRepository.create(reviewData);
+      await reviewRepository.save(review);
+      reviews.push(review);
+    }
+  }
+  console.log(`✅ Created ${reviews.length} movie reviews`);
 
-//   // 9. Seed reviews
-//   console.log("✍️ Seeding movie reviews...");
-//   const reviews: Review[] = [];
+  // Seed bookings and booked seats
+  console.log("🎟️ Seeding bookings and booked seats...");
+  const bookings: Booking[] = [];
+  const bookedSeats: BookedSeat[] = [];
 
-//   // Create ~3 reviews per movie
-//   for (const movie of movies) {
-//     const reviewCount = faker.number.int({ min: 2, max: 5 });
-//     const reviewers = faker.helpers.arrayElements(users, reviewCount);
+  // Create bookings for ~30% of screenings
+  const bookingScreenings = faker.helpers.arrayElements(
+    screenings,
+    Math.floor(screenings.length * 0.3)
+  );
 
-//     for (const user of reviewers) {
-//       const reviewData = createFakeReview(user.id, movie.id);
-//       const review = reviewRepository.create(reviewData);
-//       await reviewRepository.save(review);
-//       reviews.push(review);
-//     }
-//   }
-//   console.log(`✅ Created ${reviews.length} movie reviews`);
+  for (const screening of bookingScreenings) {
+    // Get 1-3 random users to create bookings for this screening
+    const bookingUsersCount = faker.number.int({ min: 1, max: 3 });
+    const bookingUsers = faker.helpers.arrayElements(users, bookingUsersCount);
 
-//   // 10. Seed bookings and booked seats
-//   console.log("🎟️ Seeding bookings and booked seats...");
-//   const bookings: Booking[] = [];
-//   const bookedSeats: BookedSeat[] = [];
+    for (const user of bookingUsers) {
+      // Get available seats for this room
+      const availableSeats = await seatRepository.find({
+        where: { room_id: screening.room_id },
+      });
 
-//   // Create bookings for ~30% of screenings
-//   const bookingScreenings = faker.helpers.arrayElements(
-//     screenings,
-//     Math.floor(screenings.length * 0.3)
-//   );
+      // Book 1-4 seats
+      const ticketCount = faker.number.int({ min: 1, max: 4 });
+      const selectedSeats = faker.helpers.arrayElements(
+        availableSeats,
+        ticketCount
+      );
 
-//   for (const screening of bookingScreenings) {
-//     // Get 1-3 random users to create bookings for this screening
-//     const bookingUsersCount = faker.number.int({ min: 1, max: 3 });
-//     const bookingUsers = faker.helpers.arrayElements(users, bookingUsersCount);
+      if (selectedSeats.length === 0) continue;
 
-//     for (const user of bookingUsers) {
-//       // Get available seats for this room
-//       const availableSeats = await seatRepository.find({
-//         where: { theater_id: screening.theater_id },
-//       });
+      // Create booking
+      const totalAmount = parseFloat(
+        (screening.price * selectedSeats.length).toFixed(2)
+      );
+      const bookingData = {
+        referenceNumber: `INV-${faker.string.alphanumeric(8).toUpperCase()}`,
+        ticketCount: selectedSeats.length,
+        totalAmount: totalAmount,
+        status: faker.helpers.arrayElement(Object.values(BookingStatus)),
+        user_id: user.id,
+        screening_id: screening.id,
+      };
 
-//       // Book 1-4 seats
-//       const ticketCount = faker.number.int({ min: 1, max: 4 });
-//       const selectedSeats = faker.helpers.arrayElements(
-//         availableSeats,
-//         ticketCount
-//       );
+      const booking = bookingRepository.create(bookingData);
+      await bookingRepository.save(booking);
+      bookings.push(booking);
 
-//       if (selectedSeats.length === 0) continue;
+      // Create booked seats
+      for (const seat of selectedSeats) {
+        const bookedSeatData = {
+          booking_id: booking.id,
+          seat_id: seat.id,
+          screening_id: screening.id,
+          price: screening.price,
+        };
 
-//       // Create booking
-//       const totalAmount = parseFloat(
-//         (screening.price * selectedSeats.length).toFixed(2)
-//       );
-//       const bookingData = {
-//         referenceNumber: `INV-${faker.string.alphanumeric(8).toUpperCase()}`,
-//         ticketCount: selectedSeats.length,
-//         totalAmount: totalAmount,
-//         status: faker.helpers.arrayElement(Object.values(BookingStatus)),
-//         user_id: user.id,
-//         screening_id: screening.id,
-//       };
+        const bookedSeat = bookedSeatRepository.create(bookedSeatData);
+        await bookedSeatRepository.save(bookedSeat);
+        bookedSeats.push(bookedSeat);
+      }
+    }
+  }
 
-//       const booking = bookingRepository.create(bookingData);
-//       await bookingRepository.save(booking);
-//       bookings.push(booking);
-
-//       // Create booked seats
-//       for (const seat of selectedSeats) {
-//         const bookedSeatData = {
-//           booking_id: booking.id,
-//           seat_id: seat.id,
-//           price: screening.price,
-//         };
-
-//         const bookedSeat = bookedSeatRepository.create(bookedSeatData);
-//         await bookedSeatRepository.save(bookedSeat);
-//         bookedSeats.push(bookedSeat);
-//       }
-//     }
-//   }
-
-//   console.log(
-//     `✅ Created ${bookings.length} bookings with ${bookedSeats.length} booked seats`
-//   );
-//   console.log("✅ Database seeding completed successfully!");
-// };
+  console.log(
+    `✅ Created ${bookings.length} bookings with ${bookedSeats.length} booked seats`
+  );
+  console.log("✅ Database seeding completed successfully!");
+};
