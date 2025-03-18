@@ -73,7 +73,7 @@ export class ScreeningService {
   }
 
   async create(createScreeningDto: CreateScreeningDto): Promise<Screening> {
-    const { movie_id, theater_id, ...screeningData } = createScreeningDto;
+    const { movie_id, theater_id: room_id, ...screeningData } = createScreeningDto;
     
     // Verify movie exists
     const movie = await this.movieRepository.findOne({ where: { id: movie_id } });
@@ -82,9 +82,9 @@ export class ScreeningService {
     }
     
     // Verify room exists
-    const room = await this.theaterRepository.findOne({ where: { id: theater_id } });
+    const room = await this.theaterRepository.findOne({ where: { id: room_id } });
     if (!room) {
-      throw new NotFoundException(`Room with ID ${theater_id} not found`);
+      throw new NotFoundException(`Room with ID ${room_id} not found`);
     }
     
     // Check for screening time conflicts in the same room
@@ -98,7 +98,7 @@ export class ScreeningService {
     // Check for conflicts
     const existingScreening = await this.screeningRepository.findOne({
       where: {
-        theater_id,
+        room_id,
         startTime: Between(
           new Date(startTimeDate.getTime() - 30 * 60 * 1000), // 30 minutes before
           endTimeDate
@@ -113,7 +113,7 @@ export class ScreeningService {
     const screening = this.screeningRepository.create({
       ...screeningData,
       movie_id,
-      theater_id
+      room_id
     });
     
     return this.screeningRepository.save(screening);
@@ -143,7 +143,7 @@ export class ScreeningService {
         ? await this.movieRepository.findOne({ where: { id: movie_id } })
         : await this.movieRepository.findOne({ where: { id: screening.movie_id } });
       
-      const theaterIdToCheck = theater_id || screening.theater_id;
+      const theaterIdToCheck = theater_id || screening.room_id;
       const startTimeToCheck = updateScreeningDto.startTime 
         ? new Date(updateScreeningDto.startTime)
         : screening.startTime;

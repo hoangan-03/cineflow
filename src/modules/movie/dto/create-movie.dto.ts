@@ -8,6 +8,7 @@ import {
   Max,
 } from "class-validator";
 import { Type } from "class-transformer";
+import { Genre } from "@/entities/genre.entity";
 
 export class CreateMovieDto {
   @ApiProperty({
@@ -17,6 +18,13 @@ export class CreateMovieDto {
   @IsNotEmpty()
   @IsString()
   title: string;
+
+  @ApiProperty({
+    example: [1, 2, 3],
+    description: "Array of genre IDs",
+  })
+  @IsNotEmpty()
+  genres: Genre[];
 
   @ApiProperty({
     example:

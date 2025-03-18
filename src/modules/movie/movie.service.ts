@@ -44,10 +44,12 @@ export class MovieService {
   }
 
   async create(createMovieDto: CreateMovieDto): Promise<Movie> {
-    const { genreIds, ...movieData } = createMovieDto;
+    const { genres, ...movieData } = createMovieDto;
 
     // Find genres by IDs
-    const genres = await this.genreRepository.findByIds(genreIds);
+    const genreIds = await this.genreRepository.findByIds(
+      genres.map((genre) => genre.id)
+    );
 
     if (genres.length !== genreIds.length) {
       throw new NotFoundException("One or more genres not found");
@@ -62,12 +64,14 @@ export class MovieService {
   }
 
   async update(id: string, updateMovieDto: UpdateMovieDto): Promise<Movie> {
-    const { genreIds, ...movieData } = updateMovieDto;
+    const { genres, ...movieData } = updateMovieDto;
 
     const movie = await this.findOne(id);
 
-    if (genreIds) {
-      const genres = await this.genreRepository.findByIds(genreIds);
+    if (genres) {
+      const genreIds = await this.genreRepository.findByIds(
+        genres.map((genre) => genre.id)
+      );
 
       if (genres.length !== genreIds.length) {
         throw new NotFoundException("One or more genres not found");

@@ -11,7 +11,7 @@ import { BookingModule } from './modules/booking/booking.module';
 import { CinemaModule } from './modules/cinema/cinema.module';
 import { ReviewModule } from './modules/review/review.module';
 import { MovieModule } from './modules/movie/movie.module';
-import { TheaterModule } from './modules/room/room.module';
+import { RoomModule } from './modules/room/room.module';
 import { ScreeningModule } from './modules/screening/screening.module';
 
 @Module({
@@ -31,7 +31,7 @@ import { ScreeningModule } from './modules/screening/screening.module';
       }),
       inject: [ConfigService],
     }),
-    UserModule, AuthModule, BookingModule, CinemaModule, MovieModule, TheaterModule, ReviewModule, BookingModule, ScreeningModule
+    UserModule, AuthModule, BookingModule, CinemaModule, MovieModule, RoomModule, ReviewModule, BookingModule, ScreeningModule
   ], 
   controllers: [AppController],
   providers: [
