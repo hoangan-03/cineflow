@@ -39,7 +39,6 @@ export class AuthController {
 
   @Post("register")
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(TokenInterceptor)
   @ApiOperation({ summary: "Register a new user" })
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
@@ -52,22 +51,9 @@ export class AuthController {
     description: "Bad Request - Invalid input data",
   })
   async register(
-    @Body() signUp: RegisterUserDto,
-    @Res({ passthrough: true }) response: Response
+    @Body() signUp: RegisterUserDto
   ): Promise<RegisterUserResponseDto> {
     const user = await this.authService.register(signUp);
-
-    const tokens = this.authService.generateTokens(user);
-
-    response.cookie("token", tokens.data.access_token, {
-      httpOnly: true,
-      signed: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV === "production",
-    });
-
-    response.setHeader("Authorization", `Bearer ${tokens.data.access_token}`);
-
     return new RegisterUserResponseDto(user.email, user.username);
   }
 
