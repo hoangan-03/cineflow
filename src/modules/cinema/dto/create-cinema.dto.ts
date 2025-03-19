@@ -42,7 +42,6 @@ export class CreateCinemaDto {
     description: "Cinema phone number",
   })
   @IsNotEmpty()
-  @IsPhoneNumber()
   @MaxLength(PHONE)
   phoneNumber: string;
 

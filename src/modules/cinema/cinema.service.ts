@@ -24,6 +24,8 @@ export class CinemaService {
     private readonly screeningRepository: Repository<Screening>
   ) {}
 
+  // PUBLIC
+
   async findAll(): Promise<Cinema[]> {
     return this.cinemaRepository.find({
       relations: ["rooms"],
@@ -43,11 +45,65 @@ export class CinemaService {
     return cinema;
   }
 
-  async create(createCinemaDto: CreateCinemaDto): Promise<Cinema> {
-    // Validate input data if needed
-    if (!createCinemaDto.name || createCinemaDto.name.trim() === "") {
-      throw new BadRequestException("Cinema name is required");
+  async findRooms(cinemaId: string): Promise<Room[]> {
+    const cinema = await this.cinemaRepository.findOne({
+      where: { id: cinemaId },
+      relations: ["rooms"],
+    });
+
+    if (!cinema) {
+      throw new NotFoundException(`Cinema with ID ${cinemaId} not found`);
     }
+
+    return cinema.rooms;
+  }
+
+  async findScreenings(cinemaId: string): Promise<any[]> {
+    const cinema = await this.findOne(cinemaId);
+
+    // Get all room IDs for this cinema
+    const roomIds = cinema.rooms.map((room) => room.id);
+
+    // Find all screenings for these rooms
+    const screenings = await this.screeningRepository
+      .createQueryBuilder("screening")
+      .leftJoinAndSelect("screening.room", "room")
+      .leftJoinAndSelect("screening.movie", "movie")
+      .where("room.id IN (:...roomIds)", { roomIds })
+      .orderBy("screening.startTime", "ASC")
+      .getMany();
+
+    return screenings;
+  }
+
+  // MOVIEGOER AND STAFF
+
+  async findUpcomingScreenings(cinemaId: string): Promise<any[]> {
+    const cinema = await this.findOne(cinemaId);
+    const roomIds = cinema.rooms.map((room) => room.id);
+
+    // Get screenings starting from now
+    const now = new Date();
+
+    const screenings = await this.screeningRepository
+      .createQueryBuilder("screening")
+      .leftJoinAndSelect("screening.room", "room")
+      .leftJoinAndSelect("screening.movie", "movie")
+      .where("room.id IN (:...roomIds)", { roomIds })
+      .andWhere("screening.startTime > :now", { now })
+      .orderBy("screening.startTime", "ASC")
+      .getMany();
+
+    return screenings;
+  }
+
+  // STAFF
+
+  async create(createCinemaDto: CreateCinemaDto): Promise<Cinema> {
+    console.log("Received DTO:", createCinemaDto);
+    // if (!createCinemaDto.name || createCinemaDto.name.trim() === "") {
+    //   throw new BadRequestException("Cinema name is required");
+    // }
 
     const cinema = this.cinemaRepository.create(createCinemaDto);
     return this.cinemaRepository.save(cinema);
@@ -55,8 +111,6 @@ export class CinemaService {
 
   async update(id: string, updateCinemaDto: UpdateCinemaDto): Promise<Cinema> {
     const cinema = await this.findOne(id);
-
-    // Validate input data if needed
     if (updateCinemaDto.name && updateCinemaDto.name.trim() === "") {
       throw new BadRequestException("Cinema name cannot be empty");
     }
@@ -82,38 +136,6 @@ export class CinemaService {
     }
   }
 
-  async findRooms(cinemaId: string): Promise<Room[]> {
-    const cinema = await this.cinemaRepository.findOne({
-      where: { id: cinemaId },
-      relations: ["rooms"],
-    });
-
-    if (!cinema) {
-      throw new NotFoundException(`Cinema with ID ${cinemaId} not found`);
-    }
-
-    return cinema.rooms;
-  }
-
-  async findscreenings(cinemaId: string): Promise<any[]> {
-    const cinema = await this.findOne(cinemaId);
-
-    // Get all room IDs for this cinema
-    const roomIds = cinema.rooms.map((room) => room.id);
-
-    // Find all screenings for these rooms
-    const screenings = await this.screeningRepository
-      .createQueryBuilder("screening")
-      .leftJoinAndSelect("screening.room", "room")
-      .leftJoinAndSelect("screening.movie", "movie")
-      .where("room.id IN (:...roomIds)", { roomIds })
-      .orderBy("screening.startTime", "ASC")
-      .getMany();
-
-    return screenings;
-  }
-
-  // Staff-only method to get cinema statistics
   async getStatistics(cinemaId: string): Promise<any> {
     const cinema = await this.findOne(cinemaId);
 
@@ -121,24 +143,65 @@ export class CinemaService {
     const roomCount = cinema.rooms ? cinema.rooms.length : 0;
 
     // Get all room IDs for this cinema
-    const theaterIds = cinema.rooms.map((room) => room.id);
+    const roomIds = cinema.rooms.map((room) => room.id);
 
     // Count upcoming showtimes
     const upcomingShowtimesCount = await this.screeningRepository.count({
       where: {
-        room: { id: In(theaterIds) },
+        room: { id: In(roomIds) },
         startTime: MoreThan(new Date()),
       },
     });
 
-    // Additional statistics can be added here
+    // Get total seats capacity
+    const totalSeats = cinema.rooms.reduce(
+      (sum, room) => sum + room.totalSeats,
+      0
+    );
 
     return {
       cinemaId: cinema.id,
       cinemaName: cinema.name,
-      theaterCount: roomCount,
+      roomCount,
+      totalSeats,
       upcomingShowtimesCount,
-      // Add more statistics as needed
+    };
+  }
+
+  async getAllStatistics(): Promise<any> {
+    const cinemas = await this.cinemaRepository.find({ relations: ["rooms"] });
+
+    // Get total cinema count
+    const cinemaCount = cinemas.length;
+
+    // Get total room count across all cinemas
+    const roomCount = cinemas.reduce(
+      (sum, cinema) => sum + cinema.rooms.length,
+      0
+    );
+
+    // Get upcoming screenings count
+    const upcomingScreeningsCount = await this.screeningRepository.count({
+      where: {
+        startTime: MoreThan(new Date()),
+      },
+    });
+
+    // Get cinema with most rooms
+    const cinemaWithMostRooms = cinemas.reduce(
+      (max, cinema) => (cinema.rooms.length > max.rooms.length ? cinema : max),
+      cinemas[0]
+    );
+
+    return {
+      totalCinemas: cinemaCount,
+      totalRooms: roomCount,
+      upcomingScreeningsCount,
+      cinemaWithMostRooms: {
+        id: cinemaWithMostRooms?.id,
+        name: cinemaWithMostRooms?.name,
+        roomCount: cinemaWithMostRooms?.rooms.length,
+      },
     };
   }
 }

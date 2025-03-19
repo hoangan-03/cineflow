@@ -3,7 +3,13 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { BaseEntity } from "@/entities/base-class";
 import { Room } from "@/entities/room.entity";
 import { Max, MaxLength, Min, MinLength } from "class-validator";
-import { FREE_STR, PHONE, LONG_STR, URL_STR, MIN_NAME } from "@/constants/validation.constant";
+import {
+  FREE_STR,
+  PHONE,
+  LONG_STR,
+  URL_STR,
+  MIN_NAME,
+} from "@/constants/validation.constant";
 
 @Entity({ name: "cinemas" })
 export class Cinema extends BaseEntity {

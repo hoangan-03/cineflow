@@ -38,7 +38,6 @@ export class UpdateCinemaDto {
     nullable: true,
   })
   @IsOptional()
-  @IsPhoneNumber()
   @MaxLength(PHONE)
   phoneNumber?: string;
 
