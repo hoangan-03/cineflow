@@ -12,6 +12,8 @@ import { Screening } from "@/entities/screening.entity";
 import { Review } from "@/entities/review.entity";
 import { Genre } from "@/entities/genre.entity";
 import defaultUrls from "@/constants/default-urls.constant";
+import { URL_STR } from "@/constants/validation.constant";
+import { MaxLength } from "class-validator";
 
 @Entity({ name: "movies" })
 export class Movie extends BaseEntity {
@@ -65,6 +67,7 @@ export class Movie extends BaseEntity {
   @Column({ type: "date" })
   releaseDate: Date;
 
+  @MaxLength(URL_STR)
   @ApiPropertyOptional({
     example: "https://example.com/poster.jpg",
     description: "Movie poster URL",
@@ -72,6 +75,7 @@ export class Movie extends BaseEntity {
   @Column({ type: "text", nullable: true, default: defaultUrls.POSTER_URL })
   posterUrl: string;
 
+  @MaxLength(URL_STR)
   @ApiPropertyOptional({
     example: "https://example.com/trailer.mp4",
     description: "Movie trailer URL",

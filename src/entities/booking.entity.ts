@@ -12,6 +12,8 @@ import { User } from "@/entities/user.entity";
 import { Screening } from "@/entities/screening.entity";
 import { BookedSeat } from "@/entities/booked-seat.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
+import { LONG_STR, STD_STR } from "@/constants/validation.constant";
+import { Max, MaxLength } from "class-validator";
 
 @Entity({ name: "bookings" })
 export class Booking extends BaseEntity {
@@ -22,13 +24,15 @@ export class Booking extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @MaxLength(STD_STR)
   @ApiProperty({
     example: "INV-12345",
     description: "Booking reference number"
   })
-  @Column({ type: "varchar", length: 20, unique: true })
+  @Column({ type: "varchar", length: STD_STR, unique: true })
   referenceNumber: string;
 
+  @Max(LONG_STR)
   @ApiProperty({
     example: 2,
     description: "Number of tickets booked"

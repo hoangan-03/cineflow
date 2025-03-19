@@ -8,9 +8,11 @@ import {
   IsArray,
   IsUUID,
   IsNotEmpty,
+  MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Genre } from "@/entities/genre.entity";
+import { URL_STR } from "@/constants/validation.constant";
 
 export class UpdateMovieDto {
   @ApiProperty({
@@ -74,6 +76,7 @@ export class UpdateMovieDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(URL_STR)
   posterUrl?: string;
 
   @ApiProperty({
@@ -83,5 +86,6 @@ export class UpdateMovieDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(URL_STR)
   trailerUrl?: string;
 }

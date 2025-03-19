@@ -33,8 +33,9 @@ const dropDatabase = async () => {
     await queryRunner.query('DROP TABLE IF EXISTS reviews CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS screenings CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS seats CASCADE');
-    await queryRunner.query('DROP TABLE IF EXISTS theaters CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS rooms CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS cinemas CASCADE');
+    await queryRunner.query('DROP TABLE IF EXISTS reviews CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS movies CASCADE');
     await queryRunner.query('DROP TABLE IF EXISTS genres CASCADE');
     

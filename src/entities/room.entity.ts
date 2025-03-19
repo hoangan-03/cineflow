@@ -10,6 +10,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BaseEntity } from "@/entities/base-class";
 import { Cinema } from "@/entities/cinema.entity";
 import { Screening } from "@/entities/screening.entity";
+import { FREE_STR } from "@/constants/validation.constant";
+import { MaxLength } from "class-validator";
 
 @Entity({ name: "rooms" })
 export class Room extends BaseEntity {
@@ -20,11 +22,12 @@ export class Room extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
+  @MaxLength(FREE_STR)
   @ApiProperty({
     example: "Room 1",
-    description: "Room name/number"
+    description: "Room name"
   })
-  @Column({ type: "varchar", length: 50 })
+  @Column({ type: "varchar", length: FREE_STR, default: "Room 1" })
   name: string;
 
   @ApiProperty({

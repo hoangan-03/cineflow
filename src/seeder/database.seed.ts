@@ -14,9 +14,9 @@ import { Genre } from "@/entities/genre.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 import { Role } from "@/modules/auth/enums/role.enum";
 import { cinemaData, movieData, movieGenres } from "./sample-data";
+import { hashPassword } from "@/utils/hash-password";
 
-
-const createFakeUser = () => {
+const createFakeUser = async () => {
   const gender = faker.helpers.arrayElement([
     Gender.MALE,
     Gender.FEMALE,
@@ -26,22 +26,51 @@ const createFakeUser = () => {
     gender === Gender.OTHER
       ? undefined
       : (gender.toLowerCase() as "male" | "female");
-  const firstName = faker.person.firstName(genderParam);
-  const lastName = faker.person.lastName();
+
+  const email = "testuseremail@gmail.com";
+  const username = "testuser123";
+  const password = "Password123@";
+  const hashedPassword = await hashPassword(password);
 
   return {
-    email: faker.internet.email({ firstName, lastName }),
-    username: faker.internet.username({ firstName, lastName }),
-    password: faker.internet.password(),
+    email: email,
+    username: username,
+    password: hashedPassword,
     phoneNumber: faker.phone.number({ style: "national" }),
     dob: faker.date.birthdate(),
     gender,
     profileImageUrl: faker.image.avatar(),
     address: faker.location.streetAddress(),
-    role: faker.helpers.arrayElement(Object.values(Role)),
+    role: Role.MOVIEGOER,
   };
 };
+const createFakeStaff = async () => {
+  const gender = faker.helpers.arrayElement([
+    Gender.MALE,
+    Gender.FEMALE,
+    Gender.OTHER,
+  ]) as Gender;
+  const genderParam =
+    gender === Gender.OTHER
+      ? undefined
+      : (gender.toLowerCase() as "male" | "female");
+  const email = "teststaffemail@gmail.com";
+  const username = "teststaff123";
+  const password = "Password123@";
+  const hashedPassword = await hashPassword(password);
 
+  return {
+    email: email,
+    username: username,
+    password: hashedPassword,
+    phoneNumber: faker.phone.number({ style: "national" }),
+    dob: faker.date.birthdate(),
+    gender,
+    profileImageUrl: faker.image.avatar(),
+    address: faker.location.streetAddress(),
+    role: Role.STAFF,
+  };
+};
 const createFakeReview = (userId: string, movieId: string) => {
   return {
     user_id: userId,
@@ -56,10 +85,7 @@ const createFakeReview = (userId: string, movieId: string) => {
 };
 
 // Seeding function
-export const seedDatabase = async (
-  dataSource: DataSource,
-  userCount: number
-) => {
+export const seedDatabase = async (dataSource: DataSource) => {
   console.log("🌱 Starting database seeding process...");
 
   // Get all repositories
@@ -92,17 +118,32 @@ export const seedDatabase = async (
     await manager.query('DELETE FROM "users"');
   });
 
+  const userCount = 1;
+  const staffCount = 1; // Number of staff members to create
+
   // Seed users
   console.log(`👤 Seeding ${userCount} users...`);
   const users: User[] = [];
 
   for (let i = 0; i < userCount; i++) {
-    const userData = createFakeUser();
+    const userData = await createFakeUser();
     const user = userRepository.create(userData);
     await userRepository.save(user);
     users.push(user);
   }
   console.log(`✅ Created ${users.length} users`);
+
+  // Seed staff
+  console.log(`👤 Seeding ${staffCount} staff...`);
+  const staffs: User[] = [];
+
+  for (let i = 0; i < userCount; i++) {
+    const staffData = await createFakeStaff();
+    const staff = userRepository.create(staffData);
+    await userRepository.save(staff);
+    staffs.push(staff);
+  }
+  console.log(`✅ Created ${staffs.length} staff`);
 
   // Seed genres
   console.log("🎭 Seeding movie genres...");

@@ -32,10 +32,10 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   // STAFF
-  @Get("admin")
+  @Get("staff")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get all bookings (staff)" })
+  @ApiOperation({ summary: "Get all bookings" })
   @ApiResponse({
     status: 200,
     description: "Return all bookings",
@@ -45,10 +45,10 @@ export class BookingController {
     return this.bookingService.findAll();
   }
 
-  @Get("admin/:id")
+  @Get("staff/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get booking by ID (staff)" })
+  @ApiOperation({ summary: "Get booking by ID" })
   @ApiResponse({
     status: 200,
     description: "Return booking by ID",
@@ -59,7 +59,7 @@ export class BookingController {
     return this.bookingService.findOne(id);
   }
 
-  @Put("admin/:id")
+  @Put("staff/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Update a booking (staff)" })
@@ -76,10 +76,10 @@ export class BookingController {
     return this.bookingService.updateForStaff(id, updateBookingDto);
   }
 
-  @Put("admin/:id/cancel")
+  @Put("staff/:id/cancel")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Cancel a booking (staff)" })
+  @ApiOperation({ summary: "Cancel a booking" })
   @ApiResponse({ status: 200, description: "Booking cancelled successfully" })
   @ApiResponse({ status: 404, description: "Booking not found" })
   async cancelForStaff(@Param("id") id: string): Promise<void> {

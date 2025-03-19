@@ -6,8 +6,7 @@ const runSeed = async () => {
     await AppDataSource.initialize();
     console.log('Connected to database');
 
-    const userCount = process.argv[2] ? parseInt(process.argv[2]) : 20;
-    await seedDatabase(AppDataSource, userCount);
+    await seedDatabase(AppDataSource);
     console.log('Seeds planted successfully');
 
     await AppDataSource.destroy();

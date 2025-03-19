@@ -1,9 +1,11 @@
+import { FREE_STR, LONG_STR, PHONE, URL_STR } from "@/constants/validation.constant";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import {
   IsNotEmpty,
   IsString,
   IsOptional,
   IsPhoneNumber,
+  MaxLength,
 } from "class-validator";
 
 export class CreateCinemaDto {
@@ -13,6 +15,7 @@ export class CreateCinemaDto {
   })
   @IsNotEmpty()
   @IsString()
+  @MaxLength(FREE_STR)
   name: string;
 
   @ApiPropertyOptional({
@@ -22,7 +25,8 @@ export class CreateCinemaDto {
   })
   @IsOptional()
   @IsString()
-  owner: string;
+  @MaxLength(FREE_STR)
+  owner?: string;
 
   @ApiProperty({
     example: "123 Main Street, Cityville",
@@ -30,6 +34,7 @@ export class CreateCinemaDto {
   })
   @IsNotEmpty()
   @IsString()
+  @MaxLength(LONG_STR)
   address: string;
 
   @ApiProperty({
@@ -38,8 +43,10 @@ export class CreateCinemaDto {
   })
   @IsNotEmpty()
   @IsPhoneNumber()
+  @MaxLength(PHONE)
   phoneNumber: string;
 
+  
   @ApiPropertyOptional({
     example: "https://example.com/image.jpg",
     description: "Cinema image URL",
@@ -47,5 +54,6 @@ export class CreateCinemaDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(URL_STR)
   imageUrl?: string;
 }

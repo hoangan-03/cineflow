@@ -5,10 +5,11 @@ import {
   IsInt,
   IsDate,
   IsOptional,
-  Max,
+  MaxLength,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Genre } from "@/entities/genre.entity";
+import { URL_STR } from "@/constants/validation.constant";
 
 export class CreateMovieDto {
   @ApiProperty({
@@ -24,7 +25,7 @@ export class CreateMovieDto {
     description: "Array of genre IDs",
   })
   @IsNotEmpty()
-  genres: Genre[];
+  genres: number[];
 
   @ApiProperty({
     example:
@@ -42,6 +43,13 @@ export class CreateMovieDto {
   @IsNotEmpty()
   @IsString()
   director: string;
+
+  @ApiProperty({
+    example: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+    description: "Movie cast",
+  })
+  @IsNotEmpty()
+  cast: string[];
 
   @ApiProperty({
     example: 148,
@@ -67,6 +75,7 @@ export class CreateMovieDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(URL_STR)
   posterUrl?: string;
 
   @ApiProperty({
@@ -76,6 +85,7 @@ export class CreateMovieDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(URL_STR)
   trailerUrl?: string;
 
   @ApiProperty({
@@ -83,7 +93,6 @@ export class CreateMovieDto {
     description: "Movie rating",
   })
   @IsString()
-  @Max(5)
   @IsNotEmpty()
   rated: string;
 }

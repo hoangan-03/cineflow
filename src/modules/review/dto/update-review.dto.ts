@@ -1,3 +1,4 @@
+import { MIN_RATING, MAX_RATING } from '@/constants/validation.constant';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsBoolean, IsOptional, IsUUID, Min, Max } from 'class-validator';
 
@@ -24,8 +25,8 @@ export class UpdateReviewDto {
   })
   @IsOptional()
   @IsNumber()
-  @Min(0)
-  @Max(5)
+  @Min(MIN_RATING)
+  @Max(MAX_RATING)
   rating?: number;
 
   @ApiProperty({

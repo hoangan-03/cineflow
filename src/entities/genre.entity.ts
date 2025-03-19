@@ -6,21 +6,22 @@ import {
 } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { Movie } from "@/entities/movie.entity";
+import { FREE_STR } from "@/constants/validation.constant";
 
 @Entity({ name: "genres" })
 export class Genre {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: 1,
     description: "Genre unique identifier"
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn("increment")
+  id: number;
 
   @ApiProperty({
     example: "Sci-Fi",
     description: "Genre name"
   })
-  @Column({ type: "varchar", length: 50, unique: true })
+  @Column({ type: "varchar", length: FREE_STR, unique: true })
   name: string;
 
   @ManyToMany(() => Movie, movie => movie.genres)

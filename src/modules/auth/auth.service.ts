@@ -8,7 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import { User } from "@/entities/user.entity";
 import { RegisterUserDto } from "@/modules/auth/dto/register-user.dto";
 import { JwtPayload } from "@/modules/auth/interfaces/jwt-payload.interface";
-import { UserService } from "@/modules/user/services/user.service";
+import { UserService } from "@/modules/user/user.service";
 import { AuthTokenResponseDto } from "@/modules/auth/dto/auth-token-response.dto";
 import { AuthConstant } from "@/modules/auth/constant";
 import * as bcrypt from "bcryptjs";
