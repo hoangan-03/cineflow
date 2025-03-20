@@ -27,8 +27,7 @@ import { EMAIL } from '@/constants/validation.constant';
     @IsEmail()
     @MaxLength(EMAIL)
     @Validate(IsUserAlreadyExist)
-    readonly
-  email: string;
+    readonly email: string;
 
     constructor(email: string, username: string) {
       this.email = email;

@@ -26,6 +26,7 @@ import { Roles } from "../auth/decorators/roles.decorator";
 import { AuthUser } from "../user/decorators/user.decorator";
 
 @ApiTags("bookings")
+@ApiBearerAuth()
 @UseGuards(JWTAuthGuard, RolesGuard)
 @Controller("bookings")
 export class BookingController {
@@ -34,7 +35,6 @@ export class BookingController {
   // STAFF
   @Get("staff")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Get all bookings" })
   @ApiResponse({
     status: 200,
@@ -47,7 +47,6 @@ export class BookingController {
 
   @Get("staff/:id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Get booking by ID" })
   @ApiResponse({
     status: 200,
@@ -61,7 +60,6 @@ export class BookingController {
 
   @Put("staff/:id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Update a booking (staff)" })
   @ApiResponse({
     status: 200,
@@ -78,7 +76,6 @@ export class BookingController {
 
   @Put("staff/:id/cancel")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Cancel a booking" })
   @ApiResponse({ status: 200, description: "Booking cancelled successfully" })
   @ApiResponse({ status: 404, description: "Booking not found" })
@@ -89,7 +86,6 @@ export class BookingController {
   // MOVIEGOER
   @Post()
   @Roles(Role.MOVIEGOER, Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Create a new booking" })
   @ApiResponse({
     status: 201,
@@ -105,7 +101,6 @@ export class BookingController {
 
   @Get("user")
   @Roles(Role.MOVIEGOER)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Get all bookings for the current user" })
   @ApiResponse({
     status: 200,
@@ -118,7 +113,6 @@ export class BookingController {
 
   @Get("user/:id")
   @Roles(Role.MOVIEGOER)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Get booking by ID for the current user" })
   @ApiResponse({
     status: 200,
@@ -135,7 +129,6 @@ export class BookingController {
 
   @Put("user/:id")
   @Roles(Role.MOVIEGOER)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Update a booking (user)" })
   @ApiResponse({
     status: 200,
@@ -153,7 +146,6 @@ export class BookingController {
 
   @Put("user/:id/cancel")
   @Roles(Role.MOVIEGOER)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Cancel a booking for the current user" })
   @ApiResponse({ status: 200, description: "Booking cancelled successfully" })
   @ApiResponse({ status: 404, description: "Booking not found" })

@@ -3,8 +3,6 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   Post,
   UseGuards,
   UseInterceptors,
@@ -38,7 +36,6 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post("register")
-  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: "Register a new user" })
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
@@ -59,7 +56,6 @@ export class AuthController {
 
   @Post("login")
   @UseGuards(LocalAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @UseInterceptors(TokenInterceptor)
   @ApiOperation({ summary: "Login with email/username and password" })
   @ApiBody({ type: LoginUserDTO })
@@ -100,7 +96,6 @@ export class AuthController {
 
   @Post("logout")
   @UseGuards(JWTAuthGuard)
-  @HttpCode(HttpStatus.OK)
   @ApiBearerAuth()
   @ApiOperation({ summary: "Logout the current user" })
   @ApiResponse({

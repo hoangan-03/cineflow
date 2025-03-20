@@ -43,6 +43,7 @@ export class CreateCinemaDto {
   })
   @IsNotEmpty()
   // @IsPhoneNumber()
+  // Remove this validation since it is somewhat strict and not necessary
   @MaxLength(PHONE)
   phoneNumber: string;
 

@@ -1,6 +1,6 @@
 import { FREE_STR, PHONE, URL_STR } from "@/constants/validation.constant";
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsString, IsOptional, IsPhoneNumber, Max, MaxLength, MAX_LENGTH } from "class-validator";
+import { IsString, IsOptional, IsPhoneNumber, MaxLength } from "class-validator";
 
 export class UpdateCinemaDto {
   @ApiPropertyOptional({

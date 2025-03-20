@@ -30,8 +30,7 @@ export class RegisterUserDto {
   @IsNotEmpty()
   @MaxLength(EMAIL)
   @Validate(IsUserAlreadyExist)
-  readonly;
-  email: string;
+  readonly email: string;
 
   @ApiProperty({
     example: "Password123@",

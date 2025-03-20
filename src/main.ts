@@ -3,23 +3,20 @@ import { AppModule } from "@/app.module";
 import { ConfigService } from "@nestjs/config";
 import {
   BadRequestException,
+  Logger,
   ValidationPipe,
   VersioningType,
 } from "@nestjs/common";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
 import * as session from "express-session";
-import { useContainer } from "class-validator";
+import { useContainer, ValidationError } from "class-validator";
 import * as compression from "compression";
-
-// Polyfill global crypto if not defined
-// if (!(global as any).crypto) {
-//   (global as any).crypto = nodeCrypto;
-// }
+import { GlobalExceptionFilter } from "./exception-filters/global-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   const configService = app.get(ConfigService);
   const port = configService.get("PORT") || 3000;
@@ -37,7 +34,7 @@ async function bootstrap() {
       },
     })
   );
-
+  app.useGlobalFilters(new GlobalExceptionFilter(configService));
   app.use(cookieParser(sessionSecret));
   app.use(compression());
   app.enableCors();
@@ -47,36 +44,22 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-      transformOptions: { enableImplicitConversion: true },
-      exceptionFactory: (validationErrors = []) => {
-        console.log(
-          "Validation errors:",
-          JSON.stringify(validationErrors, null, 2)
-        );
-        const errors = validationErrors.reduce(
-          (acc: Record<string, string>, error) => {
-            if (error.constraints) {
-              acc[error.property] = Object.values(error.constraints).join(", ");
-            } else {
-              acc[error.property] = "Invalid value";
-            }
-            return acc;
-          },
-          {}
-        );
+      transformOptions: {enableImplicitConversion: true},
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
         return new BadRequestException({
-          statusCode: 400,
           message: "Validation failed",
-          errors,
+          errors: validationErrors,
         });
       },
     })
   );
+
   const config = new DocumentBuilder()
     .setTitle("Cineflow")
     .setDescription("API for Cineflow")

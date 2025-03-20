@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsString, IsEnum, IsDateString } from "class-validator";
+import { IsOptional, IsString, IsEnum } from "class-validator";
 import { Gender } from "../enums/gender.enum";
 
 export class UpdateUserDto {
@@ -18,7 +18,6 @@ export class UpdateUserDto {
     required: false,
   })
   @IsOptional()
-  @IsDateString()
   dob?: Date;
 
   @ApiPropertyOptional({
