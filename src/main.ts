@@ -16,7 +16,7 @@ import { GlobalExceptionFilter } from "./exception-filters/global-exception.filt
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   const configService = app.get(ConfigService);
   const port = configService.get("PORT") || 3000;
@@ -37,7 +37,16 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter(configService));
   app.use(cookieParser(sessionSecret));
   app.use(compression());
-  app.enableCors();
+  const corsOptions = {
+    origin: configService.get("CORS_ORIGINS")
+      ? configService.get("CORS_ORIGINS").split(",")
+      : ["http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  };
+
+  app.enableCors(corsOptions);
 
   app.setGlobalPrefix("api");
 
@@ -50,7 +59,7 @@ async function bootstrap() {
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
-      transformOptions: {enableImplicitConversion: true},
+      transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
         return new BadRequestException({
           message: "Validation failed",
