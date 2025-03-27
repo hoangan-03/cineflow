@@ -1,13 +1,20 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsUUID, IsEnum, IsNumber, IsString, IsPositive, Min } from 'class-validator';
-import { Type } from 'class-transformer';
-import { BookingStatus } from '../enums/booking-status.enum';
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsOptional,
+    IsEnum,
+  IsNumber,
+  IsString,
+  IsPositive,
+  Min,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { BookingStatus } from "../enums/booking-status.enum";
 
 export class UpdateBookingDTO {
   @ApiProperty({
-    example: 'INV-12345',
-    description: 'Booking reference number',
-    required: false
+    example: "INV-12345",
+    description: "Booking reference number",
+    required: false,
   })
   @IsOptional()
   @IsString()
@@ -15,8 +22,8 @@ export class UpdateBookingDTO {
 
   @ApiProperty({
     example: 2,
-    description: 'Number of tickets booked',
-    required: false
+    description: "Number of tickets booked",
+    required: false,
   })
   @IsOptional()
   @IsNumber()
@@ -26,8 +33,8 @@ export class UpdateBookingDTO {
 
   @ApiProperty({
     example: 25.98,
-    description: 'Total amount paid',
-    required: false
+    description: "Total amount paid",
+    required: false,
   })
   @IsOptional()
   @IsNumber()
@@ -38,28 +45,26 @@ export class UpdateBookingDTO {
   @ApiProperty({
     enum: BookingStatus,
     example: BookingStatus.CONFIRMED,
-    description: 'Current booking status',
-    required: false
+    description: "Current booking status",
+    required: false,
   })
   @IsOptional()
   @IsEnum(BookingStatus)
   status?: BookingStatus;
 
   @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'User ID (only for staff use)',
-    required: false
+    example: "123e4567-e89b-12d3-a456-426614174000",
+    description: "User ID (only for staff use)",
+    required: false,
   })
   @IsOptional()
-  @IsUUID()
   user_id?: string;
 
   @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'Screening ID (only for staff use)',
-    required: false
+    example: "123e4567-e89b-12d3-a456-426614174000",
+    description: "Screening ID (only for staff use)",
+    required: false,
   })
   @IsOptional()
-  @IsUUID()
   screening_id?: string;
 }

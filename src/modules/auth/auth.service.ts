@@ -75,7 +75,7 @@ export class AuthService {
 
   generateTokens(user: User): AuthTokenResponseDto {
     const payload: JwtPayload = {
-      sub: user.id.toString(),
+      sub: user.id,
       email: user.email,
       username: user.username,
       role: user.role,
@@ -132,5 +132,4 @@ export class AuthService {
 
     return { message: "Logged out successfully" };
   }
-
 }

@@ -33,7 +33,7 @@ export class BookingService {
     private connection: Connection
   ) {}
 
-  async findAllByUser(userId: string): Promise<Booking[]> {
+  async findAllByUser(userId: number): Promise<Booking[]> {
     return this.bookingRepository.find({
       where: { user_id: userId },
       relations: [
@@ -47,7 +47,7 @@ export class BookingService {
     });
   }
 
-  async findOneByUser(id: string, userId: string): Promise<Booking> {
+  async findOneByUser(id: number, userId: number): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id, user_id: userId },
       relations: [
@@ -68,7 +68,7 @@ export class BookingService {
 
   async create(
     createBookingDto: CreateBookingDTO,
-    userId: string
+    userId: number
   ): Promise<Booking> {
     const { screening_id, seatIds } = createBookingDto;
     const queryRunner = this.connection.createQueryRunner();
@@ -92,14 +92,12 @@ export class BookingService {
         );
       }
 
-      // Check if seats exist and are not already booked for this screening
       const seats = await this.seatRepository.findByIds(seatIds);
 
       if (seats.length !== seatIds.length) {
         throw new BadRequestException("One or more seats do not exist");
       }
 
-      // Check if any seats are already booked
       const existingBookedSeats = await this.bookedSeatRepository
         .createQueryBuilder("bookedSeat")
         .innerJoin("bookedSeat.booking", "booking")
@@ -118,7 +116,6 @@ export class BookingService {
         );
       }
 
-      // Create booking
       const totalAmount = screening.price * seatIds.length;
       const referenceNumber = generateReferenceNumber();
 
@@ -133,7 +130,6 @@ export class BookingService {
 
       const savedBooking = await queryRunner.manager.save(booking);
 
-      // Create booked seats
       const bookedSeats = seats.map((seat) =>
         this.bookedSeatRepository.create({
           booking_id: savedBooking.id,
@@ -154,9 +150,9 @@ export class BookingService {
   }
 
   async update(
-    id: string,
+    id: number,
     updateBookingDto: UpdateBookingDTO,
-    userId: string
+    userId: number
   ): Promise<Booking> {
     const booking = await this.findOneByUser(id, userId);
 
@@ -203,7 +199,7 @@ export class BookingService {
     return booking;
   }
 
-  async cancel(id: string, userId: string): Promise<void> {
+  async cancel(id: number, userId: number): Promise<void> {
     const booking = await this.findOneByUser(id, userId);
 
     if (
@@ -245,7 +241,7 @@ export class BookingService {
     });
   }
 
-  async findOne(id: string): Promise<Booking> {
+  async findOne(id: number): Promise<Booking> {
     const booking = await this.bookingRepository.findOne({
       where: { id },
       relations: [
@@ -266,7 +262,7 @@ export class BookingService {
   }
 
   async updateForStaff(
-    id: string,
+    id: number,
     updateBookingDto: UpdateBookingDTO
   ): Promise<Booking> {
     const booking = await this.findOne(id);
@@ -318,7 +314,7 @@ export class BookingService {
     return this.bookingRepository.save(booking);
   }
 
-  async cancelForStaff(id: string): Promise<void> {
+  async cancelForStaff(id: number): Promise<void> {
     const booking = await this.findOne(id);
 
     if (

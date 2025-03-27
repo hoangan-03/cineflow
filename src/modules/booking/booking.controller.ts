@@ -35,11 +35,19 @@ export class BookingController {
   // STAFF
   @Get("staff")
   @Roles(Role.STAFF)
-  @ApiOperation({ summary: "Get all bookings" })
+  @ApiOperation({ summary: "Get all bookings - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Return all bookings",
     type: [Booking],
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
   })
   async findAllForStaff(): Promise<Booking[]> {
     return this.bookingService.findAll();
@@ -47,28 +55,44 @@ export class BookingController {
 
   @Get("staff/:id")
   @Roles(Role.STAFF)
-  @ApiOperation({ summary: "Get booking by ID" })
+  @ApiOperation({ summary: "Get booking by ID - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Return booking by ID",
     type: Booking,
   })
   @ApiResponse({ status: 404, description: "Booking not found" })
-  async findOneForStaff(@Param("id") id: string): Promise<Booking> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async findOneForStaff(@Param("id") id: number): Promise<Booking> {
     return this.bookingService.findOne(id);
   }
 
   @Put("staff/:id")
   @Roles(Role.STAFF)
-  @ApiOperation({ summary: "Update a booking (staff)" })
+  @ApiOperation({ summary: "Update a booking - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Booking updated successfully",
     type: Booking,
   })
   @ApiResponse({ status: 404, description: "Booking not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async updateForStaff(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Body() updateBookingDto: UpdateBookingDTO
   ): Promise<Booking> {
     return this.bookingService.updateForStaff(id, updateBookingDto);
@@ -76,24 +100,36 @@ export class BookingController {
 
   @Put("staff/:id/cancel")
   @Roles(Role.STAFF)
-  @ApiOperation({ summary: "Cancel a booking" })
+  @ApiOperation({ summary: "Cancel a booking - Role: Staff" })
   @ApiResponse({ status: 200, description: "Booking cancelled successfully" })
   @ApiResponse({ status: 404, description: "Booking not found" })
-  async cancelForStaff(@Param("id") id: string): Promise<void> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async cancelForStaff(@Param("id") id: number): Promise<void> {
     return this.bookingService.cancelForStaff(id);
   }
 
   // MOVIEGOER
   @Post()
   @Roles(Role.MOVIEGOER, Role.STAFF)
-  @ApiOperation({ summary: "Create a new booking" })
+  @ApiOperation({ summary: "Create a new booking - Role: Moviegoer/Staff" })
   @ApiResponse({
     status: 201,
     description: "Booking created successfully",
     type: Booking,
   })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async create(
-    @AuthUser("id") userId: string,
+    @AuthUser("id") userId: number,
     @Body() createBookingDto: CreateBookingDTO
   ): Promise<Booking> {
     return this.bookingService.create(createBookingDto, userId);
@@ -101,44 +137,72 @@ export class BookingController {
 
   @Get("user")
   @Roles(Role.MOVIEGOER)
-  @ApiOperation({ summary: "Get all bookings for the current user" })
+  @ApiOperation({
+    summary: "Get all bookings for the current user - Role: Moviegoer",
+  })
   @ApiResponse({
     status: 200,
     description: "Return all bookings",
     type: [Booking],
   })
-  async findAll(@AuthUser("id") userId: string): Promise<Booking[]> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async findAll(@AuthUser("id") userId: number): Promise<Booking[]> {
     return this.bookingService.findAllByUser(userId);
   }
 
   @Get("user/:id")
   @Roles(Role.MOVIEGOER)
-  @ApiOperation({ summary: "Get booking by ID for the current user" })
+  @ApiOperation({
+    summary: "Get booking by ID for the current user - Role: Moviegoer",
+  })
   @ApiResponse({
     status: 200,
     description: "Return booking by ID",
     type: Booking,
   })
   @ApiResponse({ status: 404, description: "Booking not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async findOneForUser(
-    @AuthUser("id") userId: string,
-    @Param("id") bookingId: string
+    @AuthUser("id") userId: number,
+    @Param("id") bookingId: number
   ): Promise<Booking> {
     return this.bookingService.findOneByUser(bookingId, userId);
   }
 
   @Put("user/:id")
   @Roles(Role.MOVIEGOER)
-  @ApiOperation({ summary: "Update a booking (user)" })
+  @ApiOperation({ summary: "Update a booking (user) - Role: Moviegoer" })
   @ApiResponse({
     status: 200,
     description: "Booking updated successfully",
     type: Booking,
   })
   @ApiResponse({ status: 404, description: "Booking not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async update(
-    @Param("id") id: string,
-    @AuthUser("id") userId: string,
+    @Param("id") id: number,
+    @AuthUser("id") userId: number,
     @Body() updateBookingDto: UpdateBookingDTO
   ): Promise<Booking> {
     return this.bookingService.update(id, updateBookingDto, userId);
@@ -146,12 +210,22 @@ export class BookingController {
 
   @Put("user/:id/cancel")
   @Roles(Role.MOVIEGOER)
-  @ApiOperation({ summary: "Cancel a booking for the current user" })
+  @ApiOperation({
+    summary: "Cancel a booking for the current user - Role: Moviegoer",
+  })
   @ApiResponse({ status: 200, description: "Booking cancelled successfully" })
   @ApiResponse({ status: 404, description: "Booking not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async cancelForUser(
-    @AuthUser("id") userId: string,
-    @Param("id") id: string
+    @AuthUser("id") userId: number,
+    @Param("id") id: number
   ): Promise<void> {
     return this.bookingService.cancel(id, userId);
   }

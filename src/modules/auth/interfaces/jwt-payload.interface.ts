@@ -1,10 +1,10 @@
-import { Role } from '@/modules/auth/enums/role.enum';
+import { Role } from "@/modules/auth/enums/role.enum";
 
 export interface JwtPayload {
-  sub: string;          
-  email?: string;       
-  username?: string;     
-  iat?: number;         
+  sub: number;
+  email?: string;
+  username?: string;
+  iat?: number;
   exp?: number;
-  role?: Role;        
+  role?: Role;
 }

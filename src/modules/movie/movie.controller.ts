@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  BadRequestException,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -39,7 +40,7 @@ export class MovieController {
 
   @Public()
   @Get("movies")
-  @ApiOperation({ summary: "Get all movies" })
+  @ApiOperation({ summary: "Get all movies - Public" })
   @ApiResponse({ status: 200, description: "Return all movies", type: [Movie] })
   async getAllMovie(): Promise<Movie[]> {
     return this.movieService.findAll();
@@ -47,7 +48,7 @@ export class MovieController {
 
   @Public()
   @Get("movies/genres")
-  @ApiOperation({ summary: "Get all available genres" })
+  @ApiOperation({ summary: "Get all available genres - Public" })
   @ApiResponse({ status: 200, description: "Return all genres", type: [Genre] })
   async getAllGenres(): Promise<Genre[]> {
     return this.movieService.findAllGenres();
@@ -55,7 +56,7 @@ export class MovieController {
 
   @Public()
   @Get("movies/by-genre")
-  @ApiOperation({ summary: "Get all movies filtered by genre" })
+  @ApiOperation({ summary: "Get all movies filtered by genre = Public" })
   @ApiResponse({
     status: 200,
     description: "Return filtered movies by genre name",
@@ -74,16 +75,43 @@ export class MovieController {
 
   @Public()
   @Get("movies/:id")
-  @ApiOperation({ summary: "Get movie by ID" })
+  @ApiOperation({ summary: "Get movie by ID - Public" })
   @ApiResponse({ status: 200, description: "Return movie by ID", type: Movie })
   @ApiResponse({ status: 404, description: "Movie not found" })
-  async findOne(@Param("id") id: string): Promise<Movie> {
+  async findOne(@Param("id") id: number): Promise<Movie> {
     return this.movieService.findOne(id);
   }
 
   @Public()
+  @Get("movies/:id/cinemas")
+  @ApiOperation({
+    summary: "Find cinemas showing a specific movie on a given date - Public",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Return cinemas showing the specified movie",
+    type: [Movie],
+  })
+  @ApiResponse({ status: 404, description: "Movie not found" })
+  @ApiResponse({ status: 400, description: "Invalid date format" })
+  @ApiQuery({
+    name: "date",
+    required: true,
+    description: "Date in YYYY-MM-DD format",
+  })
+  async findCinemasShowingMovie(
+    @Param("id") id: number,
+    @Query("date") date: string
+  ): Promise<any[]> {
+    if (!date) {
+      throw new BadRequestException("Date parameter is required");
+    }
+    return this.movieService.findCinemasShowingMovie(id, date);
+  }
+
+  @Public()
   @Get("movies/now-playing/list")
-  @ApiOperation({ summary: "Get currently showing movies" })
+  @ApiOperation({ summary: "Get currently showing movies - Public" })
   @ApiResponse({
     status: 200,
     description: "Return currently showing movies",
@@ -95,7 +123,7 @@ export class MovieController {
 
   @Public()
   @Get("movies/coming-soon/list")
-  @ApiOperation({ summary: "Get upcoming movies" })
+  @ApiOperation({ summary: "Get upcoming movies - Public" })
   @ApiResponse({
     status: 200,
     description: "Return upcoming movies",
@@ -109,11 +137,21 @@ export class MovieController {
   @Get("user/movies/recommendations")
   @Roles(Role.MOVIEGOER)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get personalized movie recommendations" })
+  @ApiOperation({
+    summary: "Get personalized movie recommendations - Role: Moviegoer",
+  })
   @ApiResponse({
     status: 200,
     description: "Return recommended movies",
     type: [Movie],
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
   })
   async getRecommendations(@AuthUser() user: User): Promise<Movie[]> {
     return this.movieService.getRecommendations(user.id);
@@ -124,11 +162,19 @@ export class MovieController {
   @Post("staff/movies")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Create a new movie" })
+  @ApiOperation({ summary: "Create a new movie - Role: Staff" })
   @ApiResponse({
     status: 201,
     description: "Movie created successfully",
     type: Movie,
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
   })
   async create(@Body() createMovieDto: CreateMovieDto): Promise<Movie> {
     return this.movieService.create(createMovieDto);
@@ -137,15 +183,23 @@ export class MovieController {
   @Put("staff/movies/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a movie' })
+  @ApiOperation({ summary: "Update a movie - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Movie updated successfully",
     type: Movie,
   })
-  @ApiResponse({ status: 404, description: "Movie not found" })
+  @ApiResponse({ status: 404, description: "Movie not found - Role: Staff" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async update(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Body() updateMovieDto: UpdateMovieDto
   ): Promise<Movie> {
     return this.movieService.update(id, updateMovieDto);
@@ -154,10 +208,18 @@ export class MovieController {
   @Delete("staff/movies/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete a movie' })
+  @ApiOperation({ summary: "Delete a movie - Role: Staff" })
   @ApiResponse({ status: 200, description: "Movie deleted successfully" })
   @ApiResponse({ status: 404, description: "Movie not found" })
-  async remove(@Param("id") id: string): Promise<void> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async remove(@Param("id") id: number): Promise<void> {
     return this.movieService.remove(id);
   }
 }

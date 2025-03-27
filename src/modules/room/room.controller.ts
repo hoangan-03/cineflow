@@ -35,7 +35,11 @@ export class RoomController {
 
   @Roles(Role.STAFF, Role.MOVIEGOER)
   @Get()
-  @ApiOperation({ summary: "Get all rooms" })
+  @ApiOperation({ summary: "Get all rooms - Role: Moviegoer/Staff" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   @ApiResponse({ status: 200, description: "Return all rooms", type: [Room] })
   async findAll(): Promise<Room[]> {
     return this.roomService.findAll();
@@ -43,23 +47,31 @@ export class RoomController {
 
   @Roles(Role.STAFF, Role.MOVIEGOER)
   @Get("cinema/:cinemaId")
-  @ApiOperation({ summary: "Get all rooms by cinema" })
+  @ApiOperation({ summary: "Get all rooms by cinema - Role: Moviegoer/Staff" })
   @ApiResponse({
     status: 200,
     description: "Return all rooms for a cinema",
     type: [Room],
   })
-  async findByCinema(@Param("cinemaId") cinemaId: string): Promise<Room[]> {
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async findByCinema(@Param("cinemaId") cinemaId: number): Promise<Room[]> {
     return this.roomService.findByCinema(cinemaId);
   }
 
   @Roles(Role.STAFF, Role.MOVIEGOER)
   @Get(":id")
-  @ApiOperation({ summary: "Get room by ID" })
+  @ApiOperation({ summary: "Get room by ID - Role: Moviegoer/Staff" })
   @ApiResponse({ status: 200, description: "Return room by ID", type: Room })
   @ApiResponse({ status: 404, description: "Room not found" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async findOne(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @AuthUser("role") role: Role
   ): Promise<Room> {
     return this.roomService.findOne(id, role);
@@ -68,11 +80,19 @@ export class RoomController {
   @Post()
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Create a new room" })
+  @ApiOperation({ summary: "Create a new room - Role: Staff" })
   @ApiResponse({
     status: 201,
     description: "Room created successfully",
     type: Room,
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
   })
   async create(@Body() createTheaterDto: CreateRoomDto): Promise<Room> {
     return this.roomService.create(createTheaterDto);
@@ -81,15 +101,23 @@ export class RoomController {
   @Put(":id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update a room" })
+  @ApiOperation({ summary: "Update a room - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Room updated successfully",
     type: Room,
   })
   @ApiResponse({ status: 404, description: "Room not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async update(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Body() updateTheaterDto: UpdateRoomDto,
     @Request() req
   ): Promise<Room> {
@@ -99,30 +127,49 @@ export class RoomController {
   @Delete(":id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Delete a room" })
+  @ApiOperation({ summary: "Delete a room - Role: Staff" })
   @ApiResponse({ status: 200, description: "Room deleted successfully" })
   @ApiResponse({ status: 404, description: "Room not found" })
-  async remove(@Param("id") id: string): Promise<void> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async remove(@Param("id") id: number): Promise<void> {
     return this.roomService.remove(id);
   }
 
   @Roles(Role.STAFF, Role.MOVIEGOER)
   @Get(":id/seats")
-  @ApiOperation({ summary: "Get all seats in a room" })
+  @ApiOperation({ summary: "Get all seats in a room - Role: Moviegoer/Staff" })
   @ApiResponse({ status: 200, description: "Return all seats in a room" })
   @ApiResponse({ status: 404, description: "Room not found" })
-  async findSeats(@Param("id") id: string) {
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async findSeats(@Param("id") id: number) {
     return this.roomService.findSeats(id);
   }
 
   @Roles(Role.STAFF, Role.MOVIEGOER)
   @Get(":id/availability")
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get room availability for a specific date" })
+  @ApiOperation({
+    summary:
+      "Get room availability for a specific date - Role: Moviegoer/Staff",
+  })
   @ApiQuery({ name: "date", required: true, type: Date })
   @ApiResponse({ status: 200, description: "Return room availability" })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async getRoomAvailability(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Query("date") dateString: string
   ) {
     const date = new Date(dateString);

@@ -21,8 +21,8 @@ export class Movie extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "Movie unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     example: "Inception",
@@ -50,7 +50,7 @@ export class Movie extends BaseEntity {
     example: 148,
     description: "Movie duration in minutes",
   })
-  @Column({ type: "integer"})
+  @Column({ type: "integer" })
   duration: number;
 
   @ApiProperty({

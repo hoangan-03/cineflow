@@ -17,8 +17,8 @@ export class BookedSeat extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "Booked seat unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     type: () => Booking,
@@ -28,8 +28,8 @@ export class BookedSeat extends BaseEntity {
   @JoinColumn({ name: "booking_id" })
   booking: Booking;
 
-  @Column({ type: "uuid" })
-  booking_id: string;
+  @Column()
+  booking_id: number;
 
   @ApiProperty({
     type: () => Seat,
@@ -39,8 +39,8 @@ export class BookedSeat extends BaseEntity {
   @JoinColumn({ name: "seat_id" })
   seat: Seat;
 
-  @Column({ type: "uuid" })
-  seat_id: string;
+  @Column()
+  seat_id: number;
 
   @ApiProperty({
     type: () => Screening,
@@ -49,8 +49,8 @@ export class BookedSeat extends BaseEntity {
   @ManyToOne(() => Screening, (screening) => screening.bookedSeats)
   screening: Screening;
 
-  @Column({ type: "uuid" })
-  screening_id: string;
+  @Column()
+  screening_id: number;
 
   @ApiProperty({
     example: 12.99,

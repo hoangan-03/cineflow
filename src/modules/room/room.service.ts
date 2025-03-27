@@ -37,14 +37,14 @@ export class RoomService {
     });
   }
 
-  async findByCinema(cinemaId: string): Promise<Room[]> {
+  async findByCinema(cinemaId: number): Promise<Room[]> {
     return this.roomRepository.find({
       where: { cinema_id: cinemaId },
       order: { name: "ASC" },
     });
   }
 
-  async findOne(id: string, role?: Role): Promise<Room> {
+  async findOne(id: number, role?: Role): Promise<Room> {
     const relations = ["cinema"];
 
     if (role === Role.STAFF) {
@@ -82,7 +82,7 @@ export class RoomService {
   }
 
   async update(
-    id: string,
+    id: number,
     updateTheaterDto: UpdateRoomDto,
     userRole: Role
   ): Promise<Room> {
@@ -108,7 +108,7 @@ export class RoomService {
     return this.roomRepository.save(room);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     await this.findOne(id);
     const queryRunner =
       this.roomRepository.manager.connection.createQueryRunner();
@@ -154,7 +154,7 @@ export class RoomService {
     }
   }
 
-  async findSeats(roomId: string): Promise<Seat[]> {
+  async findSeats(roomId: number): Promise<Seat[]> {
     await this.findOne(roomId);
 
     return this.seatRepository.find({
@@ -162,7 +162,7 @@ export class RoomService {
     });
   }
 
-  async getRoomAvailability(roomId: string, date: Date): Promise<any> {
+  async getRoomAvailability(roomId: number, date: Date): Promise<any> {
     const room = await this.findOne(roomId);
 
     const startOfDay = new Date(date);

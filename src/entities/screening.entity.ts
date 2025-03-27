@@ -19,8 +19,8 @@ export class Screening extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "Screening unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     example: "2024-05-15T18:30:00Z",
@@ -58,8 +58,8 @@ export class Screening extends BaseEntity {
   @JoinColumn({ name: "movie_id" })
   movie: Movie;
 
-  @Column({ type: "uuid" })
-  movie_id: string;
+  @Column()
+  movie_id: number;
 
   @ApiProperty({
     type: () => Room,
@@ -69,8 +69,8 @@ export class Screening extends BaseEntity {
   @JoinColumn({ name: "room_id" })
   room: Room;
 
-  @Column({ type: "uuid" })
-  room_id: string;
+  @Column()
+  room_id: number;
 
   @OneToMany(() => Booking, (booking) => booking.screening)
   bookings: Booking[];

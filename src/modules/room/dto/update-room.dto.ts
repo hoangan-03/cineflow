@@ -1,10 +1,10 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsInt, IsOptional, IsUUID } from 'class-validator';
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { IsString, IsInt, IsOptional } from "class-validator";
 
 export class UpdateRoomDto {
   @ApiPropertyOptional({
-    example: 'Room 1',
-    description: 'Room name/number',
+    example: "Room 1",
+    description: "Room name/number",
   })
   @IsOptional()
   @IsString()
@@ -12,17 +12,16 @@ export class UpdateRoomDto {
 
   @ApiPropertyOptional({
     example: 150,
-    description: 'Total seats in room',
+    description: "Total seats in room",
   })
   @IsOptional()
   @IsInt()
   totalSeats?: number;
 
   @ApiPropertyOptional({
-    example: '1b5a5c50-e31b-4812-9280-09a2a1ea481c',
-    description: 'ID of the cinema this room belongs to',
+    example: "1b5a5c50-e31b-4812-9280-09a2a1ea481c",
+    description: "ID of the cinema this room belongs to",
   })
   @IsOptional()
-  @IsUUID(4)
-  cinema_id?: string;
+  cinema_id?: number;
 }

@@ -12,6 +12,7 @@ import { UpdateMovieDto } from "./dto/update-movie.dto";
 import { Review } from "@/entities/review.entity";
 import { Booking } from "@/entities/booking.entity";
 import { Screening } from "@/entities/screening.entity";
+import { Cinema } from "@/entities/cinema.entity";
 
 @Injectable()
 export class MovieService {
@@ -50,17 +51,17 @@ export class MovieService {
       .createQueryBuilder("movie")
       .leftJoinAndSelect("movie.genres", "genre")
       .orderBy("movie.releaseDate", "DESC");
-  
+
     if (genreName) {
       queryBuilder
         .innerJoin("movie.genres", "filterGenre")
         .andWhere("filterGenre.name = :genreName", { genreName });
     }
-  
+
     return queryBuilder.getMany();
   }
 
-  async findOne(id: string): Promise<Movie> {
+  async findOne(id: number): Promise<Movie> {
     const movie = await this.movieRepository.findOne({
       where: { id },
       relations: ["genres"],
@@ -105,7 +106,7 @@ export class MovieService {
   }
 
   // MOVIEGOER
-  async getRecommendations(userId: string): Promise<Movie[]> {
+  async getRecommendations(userId: number): Promise<Movie[]> {
     // Get user's favorite genres based on their watched movies and reviews
     const userBookings = await this.bookingRepository.find({
       where: { user_id: userId },
@@ -198,7 +199,7 @@ export class MovieService {
     return this.movieRepository.save(movie);
   }
 
-  async update(id: string, updateMovieDto: UpdateMovieDto): Promise<Movie> {
+  async update(id: number, updateMovieDto: UpdateMovieDto): Promise<Movie> {
     const { genres, ...movieData } = updateMovieDto;
 
     const movie = await this.findOne(id);
@@ -220,7 +221,7 @@ export class MovieService {
     return this.movieRepository.save(movie);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const movie = await this.findOne(id);
 
     // Check if movie has associated screenings
@@ -237,4 +238,44 @@ export class MovieService {
     }
   }
 
+  async findCinemasShowingMovie(
+    movieId: number,
+    dateStr: string
+  ): Promise<any[]> {
+    await this.findOne(movieId);
+
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException("Invalid date format");
+    }
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const movieResults = await this.movieRepository
+      .createQueryBuilder("movie")
+      .innerJoinAndSelect("movie.screenings", "screening")
+      .innerJoinAndSelect("screening.room", "room")
+      .innerJoinAndSelect("room.cinema", "cinema")
+      .where("movie.id = :movieId", { movieId })
+      .andWhere("screening.startTime BETWEEN :start AND :end", {
+        start: startOfDay,
+        end: endOfDay,
+      })
+      .getMany();
+
+    const uniqueCinemas = new Map<number, Cinema>();
+    movieResults.forEach((movie) => {
+      movie.screenings.forEach((screening) => {
+        uniqueCinemas.set(screening.room.cinema.id, screening.room.cinema);
+      });
+    });
+
+    const cinemas = Array.from(uniqueCinemas.values());
+
+    return cinemas;
+  }
 }

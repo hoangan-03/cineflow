@@ -1,4 +1,3 @@
-
 import { MAX_RATING, MIN_RATING } from "@/constants/validation.constant";
 import { ApiProperty } from "@nestjs/swagger";
 import {
@@ -7,7 +6,6 @@ import {
   IsNumber,
   IsBoolean,
   IsOptional,
-  IsUUID,
   Min,
   Max,
 } from "class-validator";
@@ -53,6 +51,5 @@ export class CreateReviewDto {
     description: "ID of the movie being reviewed",
   })
   @IsNotEmpty()
-  @IsUUID(4)
-  movie_id: string;
+  movie_id: number;
 }

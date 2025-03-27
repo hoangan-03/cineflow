@@ -1,11 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDate, IsBoolean, IsUUID, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import { ApiProperty } from "@nestjs/swagger";
+import {
+  IsString,
+  IsNumber,
+  IsDate,
+  IsBoolean,
+  IsOptional,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class UpdateScreeningDto {
   @ApiProperty({
-    example: '2024-05-15T18:30:00Z',
-    description: 'Screening start time',
+    example: "2024-05-15T18:30:00Z",
+    description: "Screening start time",
   })
   @IsOptional()
   @Type(() => Date)
@@ -13,8 +19,8 @@ export class UpdateScreeningDto {
   startTime?: Date;
 
   @ApiProperty({
-    example: '2D',
-    description: 'Screening format (2D, 3D, IMAX)',
+    example: "2D",
+    description: "Screening format (2D, 3D, IMAX)",
   })
   @IsOptional()
   @IsString()
@@ -22,7 +28,7 @@ export class UpdateScreeningDto {
 
   @ApiProperty({
     example: 12.99,
-    description: 'Ticket price for this screening',
+    description: "Ticket price for this screening",
   })
   @IsOptional()
   @IsNumber()
@@ -30,25 +36,23 @@ export class UpdateScreeningDto {
 
   @ApiProperty({
     example: true,
-    description: 'Whether the screening is available for booking',
+    description: "Whether the screening is available for booking",
   })
   @IsOptional()
   @IsBoolean()
   isAvailable?: boolean;
 
   @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'ID of the movie being screened',
+    example: "123e4567-e89b-12d3-a456-426614174000",
+    description: "ID of the movie being screened",
   })
   @IsOptional()
-  @IsUUID(4)
-  movie_id?: string;
+  movie_id?: number;
 
   @ApiProperty({
-    example: '123e4567-e89b-12d3-a456-426614174000',
-    description: 'ID of the room where the screening takes place',
+    example: "123e4567-e89b-12d3-a456-426614174000",
+    description: "ID of the room where the screening takes place",
   })
   @IsOptional()
-  @IsUUID(4)
-  theater_id?: string;
+  theater_id?: number;
 }

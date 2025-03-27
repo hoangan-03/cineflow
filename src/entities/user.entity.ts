@@ -12,7 +12,6 @@ import {
   AfterUpdate,
   BeforeRemove,
 } from "typeorm";
-import { v4 as uuidv4 } from "uuid";
 import { Exclude } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Gender } from "@/modules/user/enums/gender.enum";
@@ -22,7 +21,12 @@ import { Inject } from "@nestjs/common";
 import { Role } from "@/modules/auth/enums/role.enum";
 import { Booking } from "@/entities/booking.entity";
 import { Review } from "@/entities/review.entity";
-import { EMAIL, FREE_STR, PHONE, URL_STR } from "@/constants/validation.constant";
+import {
+  EMAIL,
+  FREE_STR,
+  PHONE,
+  URL_STR,
+} from "@/constants/validation.constant";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
@@ -30,8 +34,8 @@ export class User extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "User unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string = uuidv4();
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     example: "user@example.com",

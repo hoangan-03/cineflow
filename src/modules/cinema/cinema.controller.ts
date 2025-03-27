@@ -36,7 +36,7 @@ export class CinemaController {
   // PUBLIC
   @Public()
   @Get("cinemas")
-  @ApiOperation({ summary: "Get all cinemas" })
+  @ApiOperation({ summary: "Get all cinemas - Public" })
   @ApiResponse({
     status: 200,
     description: "Return all cinemas",
@@ -50,11 +50,19 @@ export class CinemaController {
   @Post("staff/cinemas")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Create a new cinema" })
+  @ApiOperation({ summary: "Create a new cinema - Role: Staff" })
   @ApiResponse({
     status: 201,
     description: "Cinema created successfully",
     type: Cinema,
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
   })
   async create(@Body() createCinemaDto: CreateCinemaDto): Promise<Cinema> {
     Logger.log("Creating a new cinema", createCinemaDto);
@@ -63,35 +71,35 @@ export class CinemaController {
 
   @Public()
   @Get("cinemas/:id")
-  @ApiOperation({ summary: "Get cinema by ID" })
+  @ApiOperation({ summary: "Get cinema by ID - Public" })
   @ApiResponse({
     status: 200,
     description: "Return cinema by ID",
     type: Cinema,
   })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async findOne(@Param("id") id: string): Promise<Cinema> {
+  async findOne(@Param("id") id: number): Promise<Cinema> {
     return this.cinemaService.findOne(id);
   }
 
   @Public()
   @Get("cinemas/:id/rooms")
-  @ApiOperation({ summary: "Get all rooms in a cinema" })
+  @ApiOperation({ summary: "Get all rooms in a cinema - Public" })
   @ApiResponse({ status: 200, description: "Return all rooms in a cinema" })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async findRooms(@Param("id") id: string) {
+  async findRooms(@Param("id") id: number) {
     return this.cinemaService.findRooms(id);
   }
 
   @Public()
   @Get("cinemas/:id/screenings")
-  @ApiOperation({ summary: "Get all screenings in a cinema" })
+  @ApiOperation({ summary: "Get all screenings in a cinema - Public" })
   @ApiResponse({
     status: 200,
     description: "Return all screenings in a cinema",
   })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async findScreenings(@Param("id") id: string) {
+  async findScreenings(@Param("id") id: number) {
     return this.cinemaService.findScreenings(id);
   }
 
@@ -100,10 +108,20 @@ export class CinemaController {
   @Get("user/cinemas/:id/screenings/upcoming")
   @Roles(Role.MOVIEGOER, Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get upcoming screenings at a cinema" })
+  @ApiOperation({
+    summary: "Get upcoming screenings at a cinema - Role: Moviegoer/Staff",
+  })
   @ApiResponse({ status: 200, description: "Return upcoming screenings" })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async findUpcomingScreenings(@Param("id") id: string) {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async findUpcomingScreenings(@Param("id") id: number) {
     return this.cinemaService.findUpcomingScreenings(id);
   }
 
@@ -112,15 +130,23 @@ export class CinemaController {
   @Put("staff/cinemas/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Update a cinema" })
+  @ApiOperation({ summary: "Update a cinema - Role: Staff" })
   @ApiResponse({
     status: 200,
     description: "Cinema updated successfully",
     type: Cinema,
   })
   @ApiResponse({ status: 404, description: "Cinema not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async update(
-    @Param("id") id: string,
+    @Param("id") id: number,
     @Body() updateCinemaDto: UpdateCinemaDto
   ): Promise<Cinema> {
     return this.cinemaService.update(id, updateCinemaDto);
@@ -129,28 +155,56 @@ export class CinemaController {
   @Delete("staff/cinemas/:id")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Delete a cinema" })
+  @ApiOperation({ summary: "Delete a cinema - Role: Staff" })
   @ApiResponse({ status: 200, description: "Cinema deleted successfully" })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async remove(@Param("id") id: string): Promise<void> {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async remove(@Param("id") id: number): Promise<void> {
     return this.cinemaService.remove(id);
   }
 
   @Get("staff/cinemas/:id/stats")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get statistics for a specific cinema" })
+  @ApiOperation({
+    summary: "Get statistics for a specific cinema - Role: Staff",
+  })
   @ApiResponse({ status: 200, description: "Return cinema statistics" })
   @ApiResponse({ status: 404, description: "Cinema not found" })
-  async getStatistics(@Param("id") id: string) {
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async getStatistics(@Param("id") id: number) {
     return this.cinemaService.getStatistics(id);
   }
 
   @Get("staff/cinemas/stats/overview")
   @Roles(Role.STAFF)
   @ApiBearerAuth()
-  @ApiOperation({ summary: "Get overview statistics for all cinemas" })
+  @ApiOperation({
+    summary: "Get overview statistics for all cinemas - Role: Staff",
+  })
   @ApiResponse({ status: 200, description: "Return overview statistics" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
   async getAllStatistics() {
     return this.cinemaService.getAllStatistics();
   }

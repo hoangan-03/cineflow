@@ -3,10 +3,7 @@ import {
   IsString,
   IsInt,
   IsDate,
-  IsUrl,
   IsOptional,
-  IsArray,
-  IsUUID,
   IsNotEmpty,
   MaxLength,
 } from "class-validator";

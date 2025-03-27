@@ -32,7 +32,7 @@ export class CinemaService {
     });
   }
 
-  async findOne(id: string): Promise<Cinema> {
+  async findOne(id: number): Promise<Cinema> {
     const cinema = await this.cinemaRepository.findOne({
       where: { id },
       relations: ["rooms"],
@@ -45,7 +45,7 @@ export class CinemaService {
     return cinema;
   }
 
-  async findRooms(cinemaId: string): Promise<Room[]> {
+  async findRooms(cinemaId: number): Promise<Room[]> {
     const cinema = await this.cinemaRepository.findOne({
       where: { id: cinemaId },
       relations: ["rooms"],
@@ -58,7 +58,7 @@ export class CinemaService {
     return cinema.rooms;
   }
 
-  async findScreenings(cinemaId: string): Promise<any[]> {
+  async findScreenings(cinemaId: number): Promise<any[]> {
     const cinema = await this.findOne(cinemaId);
 
     // Get all room IDs for this cinema
@@ -78,7 +78,7 @@ export class CinemaService {
 
   // MOVIEGOER AND STAFF
 
-  async findUpcomingScreenings(cinemaId: string): Promise<any[]> {
+  async findUpcomingScreenings(cinemaId: number): Promise<any[]> {
     const cinema = await this.findOne(cinemaId);
     const roomIds = cinema.rooms.map((room) => room.id);
 
@@ -109,7 +109,7 @@ export class CinemaService {
     return this.cinemaRepository.save(cinema);
   }
 
-  async update(id: string, updateCinemaDto: UpdateCinemaDto): Promise<Cinema> {
+  async update(id: number, updateCinemaDto: UpdateCinemaDto): Promise<Cinema> {
     const cinema = await this.findOne(id);
     if (updateCinemaDto.name && updateCinemaDto.name.trim() === "") {
       throw new BadRequestException("Cinema name cannot be empty");
@@ -119,7 +119,7 @@ export class CinemaService {
     return this.cinemaRepository.save(cinema);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const cinema = await this.findOne(id);
 
     // Check if cinema has associated rooms
@@ -136,7 +136,7 @@ export class CinemaService {
     }
   }
 
-  async getStatistics(cinemaId: string): Promise<any> {
+  async getStatistics(cinemaId: number): Promise<any> {
     const cinema = await this.findOne(cinemaId);
 
     // Get room count

@@ -4,7 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
-  OneToMany
+  OneToMany,
 } from "typeorm";
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseEntity } from "@/entities/base-class";
@@ -19,15 +19,15 @@ import { Max, MaxLength } from "class-validator";
 export class Booking extends BaseEntity {
   @ApiProperty({
     example: "123e4567-e89b-12d3-a456-426614174000",
-    description: "Booking unique identifier"
+    description: "Booking unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @MaxLength(STD_STR)
   @ApiProperty({
     example: "INV-12345",
-    description: "Booking reference number"
+    description: "Booking reference number",
   })
   @Column({ type: "varchar", length: STD_STR, unique: true })
   referenceNumber: string;
@@ -35,14 +35,14 @@ export class Booking extends BaseEntity {
   @Max(LONG_STR)
   @ApiProperty({
     example: 2,
-    description: "Number of tickets booked"
+    description: "Number of tickets booked",
   })
   @Column({ type: "integer" })
   ticketCount: number;
 
   @ApiProperty({
     example: 25.98,
-    description: "Total amount paid"
+    description: "Total amount paid",
   })
   @Column({ type: "decimal", precision: 10, scale: 2 })
   totalAmount: number;
@@ -50,37 +50,39 @@ export class Booking extends BaseEntity {
   @ApiProperty({
     enum: BookingStatus,
     example: BookingStatus.CONFIRMED,
-    description: "Current booking status"
+    description: "Current booking status",
   })
   @Column({
     type: "enum",
     enum: BookingStatus,
-    default: BookingStatus.PENDING
+    default: BookingStatus.PENDING,
   })
   status: BookingStatus;
 
   @ApiProperty({
     type: () => User,
-    description: "The user who made the booking"
+    description: "The user who made the booking",
   })
   @ManyToOne(() => User)
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ type: "uuid" })
-  user_id: string;
+  @Column()
+  user_id: number;
 
   @ApiProperty({
     type: () => Screening,
-    description: "The screening being booked"
+    description: "The screening being booked",
   })
-  @ManyToOne(() => Screening, screening => screening.bookings)
+  @ManyToOne(() => Screening, (screening) => screening.bookings)
   @JoinColumn({ name: "screening_id" })
   screening: Screening;
 
-  @Column({ type: "uuid" })
-  screening_id: string;
+  @Column()
+  screening_id: number;
 
-  @OneToMany(() => BookedSeat, bookedSeat => bookedSeat.booking, { cascade: true })
+  @OneToMany(() => BookedSeat, (bookedSeat) => bookedSeat.booking, {
+    cascade: true,
+  })
   bookedSeats: BookedSeat[];
 }

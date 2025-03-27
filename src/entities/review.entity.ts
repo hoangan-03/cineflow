@@ -16,8 +16,8 @@ export class Review extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "Review unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     example:
@@ -54,8 +54,8 @@ export class Review extends BaseEntity {
   @JoinColumn({ name: "user_id" })
   user: User;
 
-  @Column({ type: "uuid" })
-  user_id: string;
+  @Column()
+  user_id: number;
 
   @ApiProperty({
     type: () => Movie,
@@ -65,6 +65,6 @@ export class Review extends BaseEntity {
   @JoinColumn({ name: "movie_id" })
   movie: Movie;
 
-  @Column({ type: "uuid" })
-  movie_id: string;
+  @Column()
+  movie_id: number;
 }

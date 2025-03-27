@@ -71,7 +71,7 @@ const createFakeStaff = async () => {
     role: Role.STAFF,
   };
 };
-const createFakeReview = (userId: string, movieId: string) => {
+const createFakeReview = (userId: number, movieId: number) => {
   return {
     user_id: userId,
     movie_id: movieId,

@@ -17,8 +17,8 @@ export class Seat extends BaseEntity {
     example: "123e4567-e89b-12d3-a456-426614174000",
     description: "Seat unique identifier",
   })
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ApiProperty({
     example: "A",
@@ -49,8 +49,8 @@ export class Seat extends BaseEntity {
   @JoinColumn({ name: "room_id" })
   room: Room;
 
-  @Column({ type: "uuid" })
-  room_id: string;
+  @Column()
+  room_id: number;
 
   @OneToMany(() => BookedSeat, (bookedSeat) => bookedSeat.seat, {
     cascade: true,
