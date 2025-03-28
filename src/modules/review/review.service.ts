@@ -21,7 +21,7 @@ export class ReviewService {
     private readonly movieRepository: Repository<Movie>
   ) {}
 
-  async findAll(movieId?: string): Promise<Review[]> {
+  async findAll(movieId?: number): Promise<Review[]> {
     const queryBuilder = this.reviewRepository
       .createQueryBuilder("review")
       .leftJoinAndSelect("review.user", "user")

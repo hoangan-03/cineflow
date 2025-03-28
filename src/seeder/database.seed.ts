@@ -15,20 +15,22 @@ import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 import { Role } from "@/modules/auth/enums/role.enum";
 import { cinemaData, movieData, movieGenres } from "./sample-data";
 import { hashPassword } from "@/utils/hash-password";
+import { SeatType } from "@/modules/seat/enums/seat-type.enum";
 
-const createFakeUser = async () => {
+const createFakeUser = async (isTestUser = false) => {
   const gender = faker.helpers.arrayElement([
     Gender.MALE,
     Gender.FEMALE,
     Gender.OTHER,
   ]) as Gender;
-  const genderParam =
-    gender === Gender.OTHER
-      ? undefined
-      : (gender.toLowerCase() as "male" | "female");
 
-  const email = "testuseremail@gmail.com";
-  const username = "testuser123";
+  // Use fixed values for test user, random values for others
+  const email = isTestUser
+    ? "testuseremail@gmail.com"
+    : faker.internet.email().toLowerCase();
+  const username = isTestUser
+    ? "testuser123"
+    : faker.internet.username().toLowerCase();
   const password = "Password123@";
   const hashedPassword = await hashPassword(password);
 
@@ -44,18 +46,21 @@ const createFakeUser = async () => {
     role: Role.MOVIEGOER,
   };
 };
-const createFakeStaff = async () => {
+
+const createFakeStaff = async (isTestStaff = false) => {
   const gender = faker.helpers.arrayElement([
     Gender.MALE,
     Gender.FEMALE,
     Gender.OTHER,
   ]) as Gender;
-  const genderParam =
-    gender === Gender.OTHER
-      ? undefined
-      : (gender.toLowerCase() as "male" | "female");
-  const email = "teststaffemail@gmail.com";
-  const username = "teststaff123";
+
+  // Use fixed values for test staff, random values for others
+  const email = isTestStaff
+    ? "teststaffemail@gmail.com"
+    : `staff.${faker.internet.email()}`.toLowerCase();
+  const username = isTestStaff
+    ? "teststaff123"
+    : `staff_${faker.internet.username()}`.toLowerCase().substring(0, 20);
   const password = "Password123@";
   const hashedPassword = await hashPassword(password);
 
@@ -118,32 +123,39 @@ export const seedDatabase = async (dataSource: DataSource) => {
     await manager.query('DELETE FROM "users"');
   });
 
-  const userCount = 1;
-  const staffCount = 1; // Number of staff members to create
+  const regularUserCount = 100;
+  const regularStaffCount = 10;
 
-  // Seed users
-  console.log(`👤 Seeding ${userCount} users...`);
-  const users: User[] = [];
+  const testUserData = await createFakeUser(true);
+  const testUser = userRepository.create(testUserData);
+  await userRepository.save(testUser);
+  const users: User[] = [testUser]; 
 
-  for (let i = 0; i < userCount; i++) {
-    const userData = await createFakeUser();
+  for (let i = 0; i < regularUserCount; i++) {
+    const userData = await createFakeUser(false);
     const user = userRepository.create(userData);
     await userRepository.save(user);
     users.push(user);
   }
-  console.log(`✅ Created ${users.length} users`);
+  console.log(
+    `✅ Created ${users.length} users (1 test user + ${regularUserCount} regular users)`
+  );
 
-  // Seed staff
-  console.log(`👤 Seeding ${staffCount} staff...`);
-  const staffs: User[] = [];
+  const testStaffData = await createFakeStaff(true);
+  const testStaff = userRepository.create(testStaffData);
+  await userRepository.save(testStaff);
 
-  for (let i = 0; i < userCount; i++) {
-    const staffData = await createFakeStaff();
+  const staffs: User[] = [testStaff];
+
+  for (let i = 0; i < regularStaffCount; i++) {
+    const staffData = await createFakeStaff(false);
     const staff = userRepository.create(staffData);
     await userRepository.save(staff);
     staffs.push(staff);
   }
-  console.log(`✅ Created ${staffs.length} staff`);
+  console.log(
+    `✅ Created ${staffs.length} staff (1 test staff + ${regularStaffCount} regular staff)`
+  );
 
   // Seed genres
   console.log("🎭 Seeding movie genres...");
@@ -221,11 +233,11 @@ export const seedDatabase = async (dataSource: DataSource) => {
     for (const row of rows) {
       for (let seatNum = 1; seatNum <= seatsPerRow; seatNum++) {
         // Determine seat type
-        let seatType = "standard";
+        let seatType = SeatType.STANDARD;
         if (row === "A" || row === "B") {
-          seatType = "vip";
+          seatType = SeatType.VIP;
         } else if (seatNum === 1 || seatNum === seatsPerRow) {
-          seatType = "accessible";
+          seatType = SeatType.ACCESSIBLE;
         }
 
         const seatData = {
@@ -291,9 +303,8 @@ export const seedDatabase = async (dataSource: DataSource) => {
   console.log("✍️ Seeding movie reviews...");
   const reviews: Review[] = [];
 
-  // Create ~3 reviews per movie
   for (const movie of movies) {
-    const reviewCount = faker.number.int({ min: 2, max: 5 });
+    const reviewCount = faker.number.int({ min: 4, max: 20 });
     const reviewers = faker.helpers.arrayElements(users, reviewCount);
 
     for (const user of reviewers) {
@@ -310,10 +321,10 @@ export const seedDatabase = async (dataSource: DataSource) => {
   const bookings: Booking[] = [];
   const bookedSeats: BookedSeat[] = [];
 
-  // Create bookings for ~30% of screenings
+  // Create bookings for ~60% of screenings
   const bookingScreenings = faker.helpers.arrayElements(
     screenings,
-    Math.floor(screenings.length * 0.3)
+    Math.floor(screenings.length * 0.6)
   );
 
   for (const screening of bookingScreenings) {

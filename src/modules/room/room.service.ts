@@ -154,16 +154,16 @@ export class RoomService {
     }
   }
 
-  async findSeats(roomId: number): Promise<Seat[]> {
-    await this.findOne(roomId);
+  async findSeats(room_id: number): Promise<Seat[]> {
+    await this.findOne(room_id);
 
     return this.seatRepository.find({
       order: { row: "ASC" },
     });
   }
 
-  async getRoomAvailability(roomId: number, date: Date): Promise<any> {
-    const room = await this.findOne(roomId);
+  async getRoomAvailability(room_id: number, date: Date): Promise<any> {
+    const room = await this.findOne(room_id);
 
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -174,7 +174,7 @@ export class RoomService {
     const screenings = await this.roomRepository
       .createQueryBuilder("room")
       .leftJoinAndSelect("room.screenings", "screening")
-      .where("room.id = :roomId", { roomId })
+      .where("room.id = :room_id", { room_id })
       .andWhere("screening.startTime BETWEEN :start AND :end", {
         start: startOfDay,
         end: endOfDay,

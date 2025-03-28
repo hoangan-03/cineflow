@@ -25,7 +25,7 @@ export class ScreeningService {
   ) {}
 
   async findAll(
-    movieId?: string,
+    movieId?: number,
     theaterId?: string,
     dateStr?: string
   ): Promise<Screening[]> {

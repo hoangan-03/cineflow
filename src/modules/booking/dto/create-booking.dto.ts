@@ -15,5 +15,5 @@ export class CreateBookingDTO {
   })
   @IsNotEmpty()
   @IsArray()
-  seatIds: string[];
+  seat_ids: string[];
 }

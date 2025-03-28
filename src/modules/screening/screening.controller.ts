@@ -43,7 +43,7 @@ export class ScreeningController {
     description: "Unauthorized",
   })
   async findAll(
-    @Query("movieId") movieId?: string,
+    @Query("movieId") movieId?: number,
     @Query("theaterId") theaterId?: string,
     @Query("date") date?: string
   ): Promise<Screening[]> {

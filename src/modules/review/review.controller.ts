@@ -22,25 +22,32 @@ import { UpdateReviewDto } from "./dto/update-review.dto";
 import { JWTAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { GetUser } from "@/modules/auth/decorators/get-user.decorator";
 import { User } from "@/entities/user.entity";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
+import { Role } from "../auth/enums/role.enum";
 
 @ApiTags("reviews")
+@ApiBearerAuth()
+@UseGuards(JWTAuthGuard, RolesGuard)
 @Controller("reviews")
 export class ReviewController {
   constructor(private readonly reviewService: ReviewService) {}
 
   @Get()
-  @ApiOperation({ summary: "Get all reviews" })
+  @Roles(Role.STAFF, Role.MOVIEGOER)
+  @ApiOperation({ summary: "Get all reviews - Role: Staff/Moviegoer" })
   @ApiResponse({
     status: 200,
     description: "Return all reviews",
     type: [Review],
   })
-  async findAll(@Query("movieId") movieId?: string): Promise<Review[]> {
-    return this.reviewService.findAll(movieId);
+  async findAll(@Query("movieId") id?: number): Promise<Review[]> {
+    return this.reviewService.findAll(id);
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "Get review by ID" })
+  @Roles(Role.STAFF, Role.MOVIEGOER)
+  @ApiOperation({ summary: "Get review by ID - Role: Staff/Moviegoer" })
   @ApiResponse({
     status: 200,
     description: "Return review by ID",
@@ -52,9 +59,8 @@ export class ReviewController {
   }
 
   @Post()
-  @UseGuards(JWTAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Create a new review" })
+  @Roles(Role.MOVIEGOER)
+  @ApiOperation({ summary: "Create a new review - Role: Moviegoer" })
   @ApiResponse({
     status: 201,
     description: "Review created successfully",
@@ -68,9 +74,8 @@ export class ReviewController {
   }
 
   @Put(":id")
-  @UseGuards(JWTAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Update a review" })
+  @Roles(Role.MOVIEGOER)
+  @ApiOperation({ summary: "Update a review - Role: Moviegoer" })
   @ApiResponse({
     status: 200,
     description: "Review updated successfully",
@@ -86,9 +91,8 @@ export class ReviewController {
   }
 
   @Delete(":id")
-  @UseGuards(JWTAuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Delete a review" })
+  @Roles(Role.MOVIEGOER, Role.STAFF)
+  @ApiOperation({ summary: "Delete a review - Role: Staff/Moviegoer" })
   @ApiResponse({ status: 200, description: "Review deleted successfully" })
   @ApiResponse({ status: 404, description: "Review not found" })
   async remove(@Param("id") id: number, @GetUser() user: User): Promise<void> {

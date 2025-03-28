@@ -70,7 +70,7 @@ export class BookingService {
     createBookingDto: CreateBookingDTO,
     userId: number
   ): Promise<Booking> {
-    const { screening_id, seatIds } = createBookingDto;
+    const { screening_id, seat_ids: seatIds } = createBookingDto;
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
