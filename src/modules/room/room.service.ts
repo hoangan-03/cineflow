@@ -158,6 +158,7 @@ export class RoomService {
     await this.findOne(room_id);
 
     return this.seatRepository.find({
+      where: { room_id: room_id },
       order: { row: "ASC" },
     });
   }

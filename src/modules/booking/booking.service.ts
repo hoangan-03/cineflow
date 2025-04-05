@@ -134,6 +134,7 @@ export class BookingService {
         this.bookedSeatRepository.create({
           booking_id: savedBooking.id,
           seat_id: seat.id,
+          screening_id: screening_id,
           price: screening.price,
         })
       );
