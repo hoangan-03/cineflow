@@ -14,7 +14,7 @@ import {
 @Entity({ name: "cinemas" })
 export class Cinema extends BaseEntity {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "Cinema unique identifier",
   })
   @PrimaryGeneratedColumn()

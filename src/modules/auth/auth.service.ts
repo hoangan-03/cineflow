@@ -83,6 +83,26 @@ export class AuthService {
     };
   }
 
+  async refreshToken(refreshToken: string): Promise<AuthTokenResponseDto> {
+    try {
+      const payload = this.jwtService.verify(refreshToken, {
+        ignoreExpiration: false, 
+      });
+  
+      const user = await this.userService.getOne({
+        where: { id: payload.sub },
+      });
+  
+      if (!user) {
+        throw new UnauthorizedException('User no longer exists');
+      }
+  
+      return this.generateTokens(user);
+    } catch (error) {
+      throw new UnauthorizedException('Could not refresh token');
+    }
+  }
+
   getUserProfile(user: User): User {
     const { password, ...userWithoutPassword } = user;
     return userWithoutPassword as User;

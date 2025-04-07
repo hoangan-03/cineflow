@@ -13,7 +13,7 @@ import { Movie } from "@/entities/movie.entity";
 @Entity({ name: "reviews" })
 export class Review extends BaseEntity {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "Review unique identifier",
   })
   @PrimaryGeneratedColumn()
@@ -35,7 +35,7 @@ export class Review extends BaseEntity {
   rating: number;
 
   @ApiProperty({
-    example: "2021-08-01T12:00:00.000Z",
+    example: "2025-04-07 10:00:00",
     description: "Review timestamp (edit or creation)",
   })
   timeStamp: Date;

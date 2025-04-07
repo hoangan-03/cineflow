@@ -10,7 +10,7 @@ import { Type } from "class-transformer";
 
 export class UpdateScreeningDto {
   @ApiProperty({
-    example: "2024-05-15T18:30:00Z",
+    example: "2025-04-07 10:00:00",
     description: "Screening start time",
   })
   @IsOptional()
@@ -43,16 +43,16 @@ export class UpdateScreeningDto {
   isAvailable?: boolean;
 
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "ID of the movie being screened",
   })
   @IsOptional()
   movie_id?: number;
 
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "ID of the room where the screening takes place",
   })
   @IsOptional()
-  theater_id?: number;
+  room_id?: number;
 }

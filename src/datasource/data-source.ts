@@ -10,6 +10,8 @@ import { Screening } from "@/entities/screening.entity";
 import { Seat } from "@/entities/seat.entity";
 import { Room } from "@/entities/room.entity";
 import * as dotenv from "dotenv";
+import { Snack } from "@/entities/snack.entity";
+import { Voucher } from "@/entities/voucher.entity";
 
 dotenv.config();
 
@@ -31,6 +33,8 @@ export const AppDataSource = new DataSource({
     Screening,
     Seat,
     Room,
+    Snack,
+    Voucher
   ],
   migrations: ["migrations/*.ts"],
   synchronize: process.env.NODE_ENV !== "production", // set to false in production

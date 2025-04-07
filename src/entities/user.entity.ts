@@ -11,6 +11,7 @@ import {
   AfterInsert,
   AfterUpdate,
   BeforeRemove,
+  ManyToMany,
 } from "typeorm";
 import { Exclude } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
@@ -27,11 +28,13 @@ import {
   PHONE,
   URL_STR,
 } from "@/constants/validation.constant";
+import { Snack } from "./snack.entity";
+import { Voucher } from "./voucher.entity";
 
 @Entity({ name: "users" })
 export class User extends BaseEntity {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "User unique identifier",
   })
   @PrimaryGeneratedColumn()
@@ -115,4 +118,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToMany(() => Snack, (snack) => snack.user)
+  snacks: Snack[];
+
+  @ManyToMany(() => Voucher, voucher => voucher.users)
+  vouchers: Voucher[];
 }

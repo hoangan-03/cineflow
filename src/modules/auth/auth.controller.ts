@@ -28,6 +28,7 @@ import { TokenInterceptor } from "@/modules/auth/interceptors/token.interceptor"
 import { LoginUserDTO } from "@/modules/auth/dto/login-user.dto";
 import { AuthTokenResponseDto } from "@/modules/auth/dto/auth-token-response.dto";
 import { RegisterUserResponseDto } from "@/modules/auth/dto/register-user-response.dto";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -72,6 +73,24 @@ export class AuthController {
     @Body() credentials: { email: string; password: string }
   ): Promise<AuthTokenResponseDto> {
     return this.authService.login(credentials.email, credentials.password);
+  }
+
+  @Post("refresh")
+  @ApiOperation({ summary: "Get new access token using refresh token" })
+  @ApiBody({ type: RefreshTokenDto })
+  @ApiResponse({
+    status: 200,
+    description: "New tokens generated successfully",
+    type: AuthTokenResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Invalid or expired refresh token",
+  })
+  async refresh(
+    @Body() refreshTokenDto: RefreshTokenDto
+  ): Promise<AuthTokenResponseDto> {
+    return this.authService.refreshToken(refreshTokenDto.refresh_token);
   }
 
   @Get("/me")

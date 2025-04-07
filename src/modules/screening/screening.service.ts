@@ -26,7 +26,7 @@ export class ScreeningService {
 
   async findAll(
     movieId?: number,
-    theaterId?: string,
+    roomId?: string,
     dateStr?: string
   ): Promise<Screening[]> {
     const queryBuilder = this.screeningRepository
@@ -39,8 +39,8 @@ export class ScreeningService {
       queryBuilder.andWhere("screening.movie_id = :movieId", { movieId });
     }
 
-    if (theaterId) {
-      queryBuilder.andWhere("screening.theater_id = :theaterId", { theaterId });
+    if (roomId) {
+      queryBuilder.andWhere("screening.room_id = :roomId", { roomId });
     }
 
     if (dateStr) {
@@ -78,11 +78,7 @@ export class ScreeningService {
   }
 
   async create(createScreeningDto: CreateScreeningDto): Promise<Screening> {
-    const {
-      movie_id,
-      theater_id: room_id,
-      ...screeningData
-    } = createScreeningDto;
+    const { movie_id, room_id, ...screeningData } = createScreeningDto;
 
     // Verify movie exists
     const movie = await this.movieRepository.findOne({
@@ -133,15 +129,15 @@ export class ScreeningService {
 
     return this.screeningRepository.save(screening);
   }
-
   async update(
     id: number,
     updateScreeningDto: UpdateScreeningDto
   ): Promise<Screening> {
     const screening = await this.findOne(id);
-    const { movie_id, theater_id, ...screeningData } = updateScreeningDto;
+    const { movie_id, room_id, startTime, ...screeningData } =
+      updateScreeningDto;
 
-    if (movie_id) {
+    if (movie_id !== undefined) {
       const movie = await this.movieRepository.findOne({
         where: { id: movie_id },
       });
@@ -150,50 +146,58 @@ export class ScreeningService {
       }
     }
 
-    if (theater_id) {
+    if (room_id !== undefined) {
       const room = await this.theaterRepository.findOne({
-        where: { id: theater_id },
+        where: { id: room_id },
       });
       if (!room) {
-        throw new NotFoundException(`Room with ID ${theater_id} not found`);
+        throw new NotFoundException(`Room with ID ${room_id} not found`);
       }
     }
 
-    // If startTime or room is changing, check for conflicts
-    if (updateScreeningDto.startTime || theater_id) {
-      const movieToCheck = movie_id
-        ? await this.movieRepository.findOne({ where: { id: movie_id } })
-        : await this.movieRepository.findOne({
-            where: { id: screening.movie_id },
-          });
+    const isRoomChanging =
+      room_id !== undefined && room_id !== screening.room_id;
+    const isStartTimeChanging =
+      startTime !== undefined &&
+      new Date(startTime).getTime() !== screening.startTime.getTime();
 
-      const theaterIdToCheck = theater_id || screening.room_id;
-      const startTimeToCheck = updateScreeningDto.startTime
-        ? new Date(updateScreeningDto.startTime)
-        : screening.startTime;
 
-      // Calculate end time
-      const endTimeDate = new Date(startTimeToCheck);
-      if (!movieToCheck) {
+    if (
+      (startTime !== undefined || isRoomChanging) &&
+      (isStartTimeChanging || isRoomChanging)
+    ) {
+      const movieToUse =
+        movie_id !== undefined
+          ? await this.movieRepository.findOne({ where: { id: movie_id } })
+          : await this.movieRepository.findOne({
+              where: { id: screening.movie_id },
+            });
+
+      if (!movieToUse) {
         throw new NotFoundException(`Movie not found`);
       }
+
+      const startTimeToCheck =
+        startTime !== undefined ? new Date(startTime) : screening.startTime;
+
+      const endTimeDate = new Date(startTimeToCheck);
       endTimeDate.setMinutes(
-        endTimeDate.getMinutes() + movieToCheck.duration + 30
+        endTimeDate.getMinutes() + movieToUse.duration + 30
       );
 
-      // Check for conflicts excluding the current screening
       const existingScreening = await this.screeningRepository
         .createQueryBuilder("screening")
-        .where("screening.theater_id = :theaterIdToCheck", { theaterIdToCheck })
+        .where("screening.room_id = :roomId", { roomId: room_id })
         .andWhere("screening.id != :id", { id })
         .andWhere(
           `(
-          screening.startTime BETWEEN :start AND :end OR 
-          DATE_ADD(screening.startTime, INTERVAL (SELECT durationMinutes FROM movies WHERE id = screening.movie_id) + 30 MINUTE) > :start
+          screening.startTime BETWEEN :bufferStart AND :endTime OR
+          (screening.startTime + INTERVAL '1 minute' * :duration) > :bufferStart
         )`,
           {
-            start: new Date(startTimeToCheck.getTime() - 30 * 60 * 1000),
-            end: endTimeDate,
+            bufferStart: new Date(startTimeToCheck.getTime() - 30 * 60 * 1000),
+            endTime: endTimeDate,
+            duration: movieToUse.duration + 30,
           }
         )
         .getOne();
@@ -205,10 +209,41 @@ export class ScreeningService {
       }
     }
 
-    Object.assign(screening, { ...screeningData, movie_id, theater_id });
+    if (isRoomChanging) {
+      await this.screeningRepository
+        .createQueryBuilder()
+        .update(Screening)
+        .set({ room_id: room_id })
+        .where("id = :id", { id })
+        .execute();
+
+      const updatedScreening = await this.screeningRepository.findOne({
+        where: { id },
+        relations: ["movie", "room", "room.cinema"],
+      });
+
+      if (!updatedScreening) {
+        throw new NotFoundException(
+          `Screening with ID ${id} not found after update`
+        );
+      }
+
+      console.log("After direct update, room_id is:", updatedScreening.room_id);
+
+      Object.assign(updatedScreening, screeningData);
+      if (movie_id !== undefined) updatedScreening.movie_id = movie_id;
+      if (startTime !== undefined)
+        updatedScreening.startTime = new Date(startTime);
+
+      return this.screeningRepository.save(updatedScreening);
+    }
+
+    Object.assign(screening, screeningData);
+    if (movie_id !== undefined) screening.movie_id = movie_id;
+    if (startTime !== undefined) screening.startTime = new Date(startTime);
+
     return this.screeningRepository.save(screening);
   }
-
   async remove(id: number): Promise<void> {
     const result = await this.screeningRepository.delete(id);
 

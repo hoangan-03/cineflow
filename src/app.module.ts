@@ -14,6 +14,9 @@ import { MovieModule } from "./modules/movie/movie.module";
 import { RoomModule } from "./modules/room/room.module";
 import { ScreeningModule } from "./modules/screening/screening.module";
 import { SeatModule } from "./modules/seat/seat.module";
+import { SnackModule } from "./modules/snack/snack.module";
+import { Voucher } from "./entities/voucher.entity";
+import { VoucherModule } from "./modules/voucher/voucher.module";
 
 @Module({
   imports: [
@@ -42,6 +45,8 @@ import { SeatModule } from "./modules/seat/seat.module";
     BookingModule,
     ScreeningModule,
     SeatModule,
+    SnackModule,
+    VoucherModule
   ],
   controllers: [AppController],
   providers: [

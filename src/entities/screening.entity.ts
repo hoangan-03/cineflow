@@ -16,14 +16,14 @@ import { BookedSeat } from "./booked-seat.entity";
 @Entity({ name: "screenings" })
 export class Screening extends BaseEntity {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "Screening unique identifier",
   })
   @PrimaryGeneratedColumn()
   id: number;
 
   @ApiProperty({
-    example: "2024-05-15T18:30:00Z",
+    example: "2025-04-07 10:00:00",
     description: "Screening start time",
   })
   @Column({ type: "timestamp" })

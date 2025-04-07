@@ -25,7 +25,7 @@ import { Public } from "@/modules/auth/decorators/public.decorator";
 @ApiTags("seats")
 @UseGuards(JWTAuthGuard, RolesGuard)
 @ApiBearerAuth()
-@Controller()
+@Controller("seats")
 export class SeatController {
   constructor(private readonly seatService: SeatService) {}
 
@@ -77,10 +77,8 @@ export class SeatController {
     return this.seatService.findSeatsAvalableByScreening(screeningId);
   }
 
-  // STAFF ROUTES
   @Post("staff/rooms/:id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Create seat for a room - Role: Staff" })
   @ApiResponse({
     status: 201,
@@ -99,7 +97,6 @@ export class SeatController {
 
   @Put("staff/:id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Update a seat - Role: Staff" })
   @ApiResponse({
     status: 200,
@@ -118,7 +115,6 @@ export class SeatController {
 
   @Delete("staff/:id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Delete a seat - Role: Staff" })
   @ApiResponse({ status: 200, description: "Seat deleted successfully" })
   @ApiResponse({ status: 404, description: "Seat not found" })

@@ -18,7 +18,7 @@ import { Max, MaxLength } from "class-validator";
 @Entity({ name: "bookings" })
 export class Booking extends BaseEntity {
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "Booking unique identifier",
   })
   @PrimaryGeneratedColumn()

@@ -5,14 +5,17 @@ import {
   Body,
   Param,
   Put,
+  Patch,
   Delete,
   Query,
+  UseGuards,
 } from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from "@nestjs/swagger";
 import { ScreeningService } from "./screening.service";
 import { Screening } from "@/entities/screening.entity";
@@ -20,8 +23,12 @@ import { CreateScreeningDto } from "./dto/create-screening.dto";
 import { UpdateScreeningDto } from "./dto/update-screening.dto";
 import { Role } from "../auth/enums/role.enum";
 import { Roles } from "../auth/decorators/roles.decorator";
+import { JWTAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
 
 @ApiTags("screenings")
+@ApiBearerAuth()
+@UseGuards(JWTAuthGuard, RolesGuard)
 @Controller("screenings")
 export class ScreeningController {
   constructor(private readonly screeningService: ScreeningService) {}
@@ -42,12 +49,39 @@ export class ScreeningController {
     status: 401,
     description: "Unauthorized",
   })
+  @ApiQuery({
+    name: "date",
+    required: false,
+    description: "Filter by date (format: YYYY-MM-DD)",
+  })
   async findAll(
     @Query("movieId") movieId?: number,
-    @Query("theaterId") theaterId?: string,
+    @Query("roomId") roomId?: string,
     @Query("date") date?: string
   ): Promise<Screening[]> {
-    return this.screeningService.findAll(movieId, theaterId, date);
+    return this.screeningService.findAll(movieId, roomId, date);
+  }
+
+  @Post()
+  @Roles(Role.STAFF)
+  @ApiOperation({ summary: "Create a new screening - Role: Staff" })
+  @ApiResponse({
+    status: 201,
+    description: "Screening created successfully",
+    type: Screening,
+  })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  async create(
+    @Body() createScreeningDto: CreateScreeningDto
+  ): Promise<Screening> {
+    return this.screeningService.create(createScreeningDto);
   }
 
   @Get(":id")
@@ -71,32 +105,8 @@ export class ScreeningController {
     return this.screeningService.findOne(id);
   }
 
-  @Post()
+  @Patch(":id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: "Create a new screening - Role: Staff" })
-  @ApiResponse({
-    status: 201,
-    description: "Screening created successfully",
-    type: Screening,
-  })
-  @ApiResponse({
-    status: 403,
-    description: "You are not allowed to access this resource",
-  })
-  @ApiResponse({
-    status: 401,
-    description: "Unauthorized",
-  })
-  async create(
-    @Body() createScreeningDto: CreateScreeningDto
-  ): Promise<Screening> {
-    return this.screeningService.create(createScreeningDto);
-  }
-
-  @Put(":id")
-  @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Update a screening - Role: Staff" })
   @ApiResponse({
     status: 200,
@@ -116,12 +126,11 @@ export class ScreeningController {
     @Param("id") id: number,
     @Body() updateScreeningDto: UpdateScreeningDto
   ): Promise<Screening> {
-    return this.screeningService.update(id, updateScreeningDto);
+    return this.screeningService.update(id, updateScreeningDto) as Promise<Screening>;
   }
 
   @Delete(":id")
   @Roles(Role.STAFF)
-  @ApiBearerAuth()
   @ApiOperation({ summary: "Delete a screening - Role: Staff" })
   @ApiResponse({ status: 200, description: "Screening deleted successfully" })
   @ApiResponse({ status: 404, description: "Screening not found" })

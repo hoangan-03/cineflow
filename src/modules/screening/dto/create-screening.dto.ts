@@ -11,7 +11,7 @@ import { Type } from "class-transformer";
 
 export class CreateScreeningDto {
   @ApiProperty({
-    example: "2024-05-15T18:30:00Z",
+    example: "2025-04-07 10:00:00",
     description: "Screening start time",
   })
   @IsNotEmpty()
@@ -44,16 +44,16 @@ export class CreateScreeningDto {
   isAvailable?: boolean;
 
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "ID of the movie being screened",
   })
   @IsNotEmpty()
   movie_id: number;
 
   @ApiProperty({
-    example: "123e4567-e89b-12d3-a456-426614174000",
+    example: "1",
     description: "ID of the room where the screening takes place",
   })
   @IsNotEmpty()
-  theater_id: number;
+  room_id: number;
 }
