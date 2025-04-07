@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsNotEmpty,
   MaxLength,
+  IsArray,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { Genre } from "@/entities/genre.entity";
@@ -25,8 +26,9 @@ export class UpdateMovieDto {
     example: [1, 2, 3],
     description: "Array of genre IDs",
   })
+  @IsOptional()
   @IsNotEmpty()
-  genres: Genre[];
+  genres?: number[];
 
   @ApiProperty({
     example:
@@ -46,6 +48,15 @@ export class UpdateMovieDto {
   @IsOptional()
   @IsString()
   director?: string;
+
+  @ApiProperty({
+    example: ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+    description: "Movie cast",
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  cast?: string[];
 
   @ApiProperty({
     example: 148,
@@ -85,4 +96,13 @@ export class UpdateMovieDto {
   @IsString()
   @MaxLength(URL_STR)
   trailerUrl?: string;
+
+  @ApiProperty({
+    example: "PG-13",
+    description: "Movie rating",
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  rated?: string;
 }
