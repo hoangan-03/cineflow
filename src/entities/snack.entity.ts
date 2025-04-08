@@ -10,6 +10,7 @@ import { BaseEntity } from "@/entities/base-class";
 import { FREE_STR } from "@/constants/validation.constant";
 import { MaxLength } from "class-validator";
 import { User } from "./user.entity";
+import { Booking } from "./booking.entity";
 
 @Entity({ name: "snacks" })
 export class Snack extends BaseEntity {
@@ -52,4 +53,12 @@ export class Snack extends BaseEntity {
 
   @Column()
   user_id: number;
+
+  @ManyToOne(() => Booking, (booking) => booking.snacks, { nullable: true })
+  @JoinColumn({ name: "booking_id" })
+  booking: Booking;
+
+  @Column({ nullable: true })
+  booking_id: number;
+
 }

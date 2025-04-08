@@ -14,6 +14,7 @@ import { BookedSeat } from "@/entities/booked-seat.entity";
 import { BookingStatus } from "@/modules/booking/enums/booking-status.enum";
 import { LONG_STR, STD_STR } from "@/constants/validation.constant";
 import { Max, MaxLength } from "class-validator";
+import { Snack } from "./snack.entity";
 
 @Entity({ name: "bookings" })
 export class Booking extends BaseEntity {
@@ -85,4 +86,10 @@ export class Booking extends BaseEntity {
     cascade: true,
   })
   bookedSeats: BookedSeat[];
+
+  @OneToMany(() => Snack, (snack) => snack.booking, {
+    cascade: true,
+  })
+  snacks: Snack[];
 }
+
