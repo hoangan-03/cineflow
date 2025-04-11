@@ -31,7 +31,7 @@ import { VoucherModule } from "./modules/voucher/voucher.module";
         password: configService.getOrThrow<string>("POSTGRES_PASSWORD"),
         database: configService.getOrThrow<string>("POSTGRES_DB"),
         autoLoadEntities: true,
-        synchronize: true, // false in production
+        synchronize: process.env.NODE_ENV !== "production", // false in production
         ssl: {
           rejectUnauthorized: false,
         },
