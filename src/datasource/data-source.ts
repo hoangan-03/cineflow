@@ -32,8 +32,11 @@ export const AppDataSource = new DataSource({
     Screening,
     Seat,
     Room,
-    Voucher
+    Voucher,
   ],
   migrations: ["migrations/*.ts"],
   synchronize: process.env.NODE_ENV !== "production", // set to false in production
+  ssl: {
+    rejectUnauthorized: false, // Use this option for development/testing
+  },
 });
