@@ -86,8 +86,8 @@ export class ScreeningController {
   }
 
   @Get(":id")
-  @Roles(Role.STAFF)
-  @ApiOperation({ summary: "Get screening by ID - Role: Staff" })
+  @Roles(Role.STAFF, Role.MOVIEGOER)
+  @ApiOperation({ summary: "Get screening by ID - Role: Staff, Moviegoer" })
   @ApiResponse({
     status: 200,
     description: "Return screening by ID",
