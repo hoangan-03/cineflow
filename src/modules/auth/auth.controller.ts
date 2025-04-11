@@ -8,6 +8,8 @@ import {
   UseInterceptors,
   Res,
   UnauthorizedException,
+  Req,
+  HttpCode,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -15,8 +17,9 @@ import {
   ApiResponse,
   ApiBody,
   ApiBearerAuth,
+  ApiCookieAuth,
 } from "@nestjs/swagger";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthUser } from "@/modules/user/decorators/user.decorator";
 import { User } from "@/entities/user.entity";
 import { AuthService } from "@/modules/auth/auth.service";
@@ -29,6 +32,7 @@ import { LoginUserDTO } from "@/modules/auth/dto/login-user.dto";
 import { AuthTokenResponseDto } from "@/modules/auth/dto/auth-token-response.dto";
 import { RegisterUserResponseDto } from "@/modules/auth/dto/register-user-response.dto";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { Public } from "../auth/decorators/public.decorator";
 
 @ApiTags("auth")
 @Controller("auth")
@@ -76,8 +80,13 @@ export class AuthController {
   }
 
   @Post("refresh")
-  @ApiOperation({ summary: "Get new access token using refresh token" })
-  @ApiBody({ type: RefreshTokenDto })
+  @Public()
+  @UseInterceptors(TokenInterceptor)
+  @HttpCode(200)
+  @ApiOperation({
+    summary: "Get new access token using refresh token from cookie",
+  })
+  @ApiCookieAuth("refresh_token")
   @ApiResponse({
     status: 200,
     description: "New tokens generated successfully",
@@ -87,10 +96,14 @@ export class AuthController {
     status: 401,
     description: "Invalid or expired refresh token",
   })
-  async refresh(
-    @Body() refreshTokenDto: RefreshTokenDto
-  ): Promise<AuthTokenResponseDto> {
-    return this.authService.refreshToken(refreshTokenDto.refresh_token);
+  async refresh(@Req() request: Request): Promise<AuthTokenResponseDto> {
+    const refreshToken = request.signedCookies?.refresh_token;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException("Refresh token is missing");
+    }
+
+    return this.authService.refreshToken(refreshToken);
   }
 
   @Get("/me")

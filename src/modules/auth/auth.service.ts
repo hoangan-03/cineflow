@@ -86,20 +86,20 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<AuthTokenResponseDto> {
     try {
       const payload = this.jwtService.verify(refreshToken, {
-        ignoreExpiration: false, 
+        ignoreExpiration: false,
       });
-  
+
       const user = await this.userService.getOne({
         where: { id: payload.sub },
       });
-  
+
       if (!user) {
-        throw new UnauthorizedException('User no longer exists');
+        throw new UnauthorizedException("User no longer exists");
       }
-  
+
       return this.generateTokens(user);
     } catch (error) {
-      throw new UnauthorizedException('Could not refresh token');
+      throw new UnauthorizedException("Could not refresh token");
     }
   }
 
@@ -124,8 +124,8 @@ export class AuthService {
     return user;
   }
 
-  logout(response: Response): { message: string } {
-    // Clear authentication cookies
+  async logout(response: Response): Promise<{ message: string }> {
+    // Clear access token cookie
     response.clearCookie("token", {
       httpOnly: true,
       signed: true,
@@ -133,8 +133,14 @@ export class AuthService {
       secure: process.env.NODE_ENV === "production",
     });
 
-    // Remove the authorization header
-    response.removeHeader("Authorization");
+    // Clear refresh token cookie
+    response.clearCookie("refresh_token", {
+      httpOnly: true,
+      signed: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      path: "/api/auth/refresh",
+    });
 
     return { message: "Logged out successfully" };
   }
