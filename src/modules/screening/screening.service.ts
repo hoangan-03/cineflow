@@ -4,11 +4,13 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Between, In } from "typeorm";
+import { Repository, Between, In, Connection } from "typeorm";
 import { Screening } from "@/entities/screening.entity";
 import { Movie } from "@/entities/movie.entity";
 import { Room } from "@/entities/room.entity";
 import { Cinema } from "@/entities/cinema.entity";
+import { Booking } from "@/entities/booking.entity";
+import { BookedSeat } from "@/entities/booked-seat.entity";
 import { CreateScreeningDto } from "./dto/create-screening.dto";
 import { UpdateScreeningDto } from "./dto/update-screening.dto";
 
@@ -25,7 +27,9 @@ export class ScreeningService {
     private readonly theaterRepository: Repository<Room>,
 
     @InjectRepository(Cinema)
-    private readonly cinemaRepository: Repository<Cinema>
+    private readonly cinemaRepository: Repository<Cinema>,
+
+    private connection: Connection
   ) {}
 
   async findAll(
@@ -189,19 +193,23 @@ export class ScreeningService {
         endTimeDate.getMinutes() + movieToUse.duration + 30
       );
 
+      // Use the room ID that will be used after update
+      const roomIdToCheck = room_id !== undefined ? room_id : screening.room_id;
+
+      // Fixed conflict check logic
       const existingScreening = await this.screeningRepository
         .createQueryBuilder("screening")
-        .where("screening.room_id = :roomId", { roomId: room_id })
-        .andWhere("screening.id != :id", { id })
+        .innerJoinAndSelect("screening.movie", "movie") // Changed leftJoin to innerJoinAndSelect
+        .where("screening.room_id = :roomId", { roomId: roomIdToCheck })
+        .andWhere("screening.id != :id", { id }) // Exclude current screening
         .andWhere(
           `(
-          screening.startTime BETWEEN :bufferStart AND :endTime OR
-          (screening.startTime + INTERVAL '1 minute' * :duration) > :bufferStart
-        )`,
+            screening.startTime <= :endTime AND 
+            (screening.startTime + INTERVAL '1 minute' * movie.duration + INTERVAL '30 minute') >= :startTime
+          )`,
           {
-            bufferStart: new Date(startTimeToCheck.getTime() - 30 * 60 * 1000),
+            startTime: startTimeToCheck,
             endTime: endTimeDate,
-            duration: movieToUse.duration + 30,
           }
         )
         .getOne();
@@ -250,10 +258,50 @@ export class ScreeningService {
   }
 
   async remove(id: number): Promise<void> {
-    const result = await this.screeningRepository.delete(id);
+    // First check if the screening exists
+    const screening = await this.findOne(id);
 
-    if (result.affected === 0) {
-      throw new NotFoundException(`Screening with ID ${id} not found`);
+    const queryRunner = this.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Find all bookings for this screening
+      const bookings = await queryRunner.manager.find(Booking, {
+        where: { screening_id: id },
+      });
+
+      const bookingIds = bookings.map((booking) => booking.id);
+
+      // Delete associated booked seats first (if any)
+      if (bookingIds.length > 0) {
+        await queryRunner.manager.delete(BookedSeat, {
+          booking_id: In(bookingIds),
+        });
+      }
+
+      // Delete the bookings
+      if (bookingIds.length > 0) {
+        await queryRunner.manager.delete(Booking, {
+          id: In(bookingIds),
+        });
+      }
+
+      // Now delete the screening
+      const result = await queryRunner.manager.delete(Screening, id);
+
+      if (result.affected === 0) {
+        throw new NotFoundException(`Screening with ID ${id} not found`);
+      }
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      // If anything fails, rollback the transaction
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Release the query runner regardless of the outcome
+      await queryRunner.release();
     }
   }
 
