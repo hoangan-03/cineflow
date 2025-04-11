@@ -31,7 +31,6 @@ import { TokenInterceptor } from "@/modules/auth/interceptors/token.interceptor"
 import { LoginUserDTO } from "@/modules/auth/dto/login-user.dto";
 import { AuthTokenResponseDto } from "@/modules/auth/dto/auth-token-response.dto";
 import { RegisterUserResponseDto } from "@/modules/auth/dto/register-user-response.dto";
-import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { Public } from "../auth/decorators/public.decorator";
 
 @ApiTags("auth")

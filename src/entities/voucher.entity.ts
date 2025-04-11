@@ -22,14 +22,6 @@ export class Voucher extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @MaxLength(FREE_STR)
-  @ApiProperty({
-    example: "Poca Wavy 1",
-    description: "Snack name",
-  })
-  @Column({ type: "varchar", length: FREE_STR, default: "Poca Wavy" })
-  name: string;
-
   @MaxLength(3)
   @ApiProperty({
     example: "SNACK123",

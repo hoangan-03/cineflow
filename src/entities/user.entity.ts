@@ -2,15 +2,7 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  BeforeInsert,
-  BeforeUpdate,
-  OneToOne,
   OneToMany,
-  AfterInsert,
-  AfterUpdate,
-  BeforeRemove,
   ManyToMany,
 } from "typeorm";
 import { Exclude } from "class-transformer";
@@ -18,7 +10,6 @@ import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Gender } from "@/modules/user/enums/gender.enum";
 import { IsEnum, IsOptional, MaxLength } from "class-validator";
 import { BaseEntity } from "@/entities/base-class";
-import { Inject } from "@nestjs/common";
 import { Role } from "@/modules/auth/enums/role.enum";
 import { Booking } from "@/entities/booking.entity";
 import { Review } from "@/entities/review.entity";
@@ -28,7 +19,6 @@ import {
   PHONE,
   URL_STR,
 } from "@/constants/validation.constant";
-import { Snack } from "./snack.entity";
 import { Voucher } from "./voucher.entity";
 
 @Entity({ name: "users" })
@@ -119,9 +109,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
 
-  @OneToMany(() => Snack, (snack) => snack.user)
-  snacks: Snack[];
-
-  @ManyToMany(() => Voucher, voucher => voucher.users)
+  @ManyToMany(() => Voucher, (voucher) => voucher.users)
   vouchers: Voucher[];
 }

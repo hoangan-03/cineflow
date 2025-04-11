@@ -16,6 +16,7 @@ import { Role } from "@/modules/auth/enums/role.enum";
 import { cinemaData, movieData, movieGenres } from "./sample-data";
 import { hashPassword } from "@/utils/hash-password";
 import { SeatType } from "@/modules/seat/enums/seat-type.enum";
+import { Voucher } from "@/entities/voucher.entity";
 
 const createFakeUser = async (isTestUser = false) => {
   const gender = faker.helpers.arrayElement([
@@ -89,6 +90,23 @@ const createFakeReview = (userId: number, movieId: number) => {
   };
 };
 
+const usedDiscounts = new Set<string>();
+const createFakeVoucher = () => {
+  let discountAmount: string;
+  do {
+    discountAmount = faker.number.int({ min: 5, max: 50 }) + "%";
+  } while (usedDiscounts.has(discountAmount));
+  usedDiscounts.add(discountAmount);
+
+  // Expiry date between 1 month and 18 months from now
+  const expDate = faker.date.future({ years: 1.5 });
+
+  return {
+    discount: discountAmount,
+    exp_date: expDate,
+  };
+};
+
 // Seeding function
 export const seedDatabase = async (dataSource: DataSource) => {
   console.log("🌱 Starting database seeding process...");
@@ -104,6 +122,7 @@ export const seedDatabase = async (dataSource: DataSource) => {
   const bookingRepository = dataSource.getRepository(Booking);
   const bookedSeatRepository = dataSource.getRepository(BookedSeat);
   const reviewRepository = dataSource.getRepository(Review);
+  const voucherRepository = dataSource.getRepository(Voucher);
 
   // Clear all data using raw queries to handle foreign key constraints
   console.log("🧹 Clearing existing data...");
@@ -120,6 +139,8 @@ export const seedDatabase = async (dataSource: DataSource) => {
     await manager.query('DELETE FROM "movie_genres"');
     await manager.query('DELETE FROM "movies"');
     await manager.query('DELETE FROM "genres"');
+    await manager.query('DELETE FROM "user_vouchers"');
+    await manager.query('DELETE FROM "vouchers"');
     await manager.query('DELETE FROM "users"');
   });
 
@@ -129,7 +150,7 @@ export const seedDatabase = async (dataSource: DataSource) => {
   const testUserData = await createFakeUser(true);
   const testUser = userRepository.create(testUserData);
   await userRepository.save(testUser);
-  const users: User[] = [testUser]; 
+  const users: User[] = [testUser];
 
   for (let i = 0; i < regularUserCount; i++) {
     const userData = await createFakeUser(false);
@@ -156,6 +177,49 @@ export const seedDatabase = async (dataSource: DataSource) => {
   console.log(
     `✅ Created ${staffs.length} staff (1 test staff + ${regularStaffCount} regular staff)`
   );
+
+  // Seed vouchers
+  console.log("🎫 Seeding vouchers...");
+  const vouchers: Voucher[] = [];
+
+  const voucherCount = 20;
+  const generatedCodes = new Set<string>();
+  const generateRandomCode = () => {
+    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const codeLength = 3;
+
+    let result = "";
+    do {
+      result = "";
+      for (let i = 0; i < codeLength; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * characters.length)
+        );
+      }
+    } while (generatedCodes.has(result));
+
+    generatedCodes.add(result);
+    return result;
+  };
+
+  for (let i = 0; i < voucherCount; i++) {
+    const voucherData = createFakeVoucher();
+    const voucherEntity = voucherRepository.create({
+      ...voucherData,
+      code: generateRandomCode(),
+    });
+
+    // Assign voucher to random users (30% chance)
+    if (faker.datatype.boolean(0.3)) {
+      const userCount = faker.number.int({ min: 1, max: 5 });
+      const selectedUsers = faker.helpers.arrayElements(users, userCount);
+      voucherEntity.users = selectedUsers;
+    }
+
+    await voucherRepository.save(voucherEntity);
+    vouchers.push(voucherEntity);
+  }
+  console.log(`✅ Created ${vouchers.length} vouchers`);
 
   // Seed genres
   console.log("🎭 Seeding movie genres...");
