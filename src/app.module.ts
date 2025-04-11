@@ -32,6 +32,9 @@ import { VoucherModule } from "./modules/voucher/voucher.module";
         database: configService.getOrThrow<string>("POSTGRES_DB"),
         autoLoadEntities: true,
         synchronize: true, // false in production
+        ssl: {
+          rejectUnauthorized: false,
+        },
       }),
       inject: [ConfigService],
     }),
@@ -46,7 +49,7 @@ import { VoucherModule } from "./modules/voucher/voucher.module";
     ScreeningModule,
     SeatModule,
     SnackModule,
-    VoucherModule
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [
