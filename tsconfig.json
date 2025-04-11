@@ -6,10 +6,14 @@
     "target": "ES2017",
     "sourceMap": true,
     "moduleResolution": "node",
-    "lib": ["ES2017"],
+    "lib": [
+      "ES2017"
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ]
     },
     "outDir": "./dist",
     "rootDir": "./src",
@@ -20,8 +24,18 @@
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "src/types/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }
