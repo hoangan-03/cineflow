@@ -4,10 +4,11 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Between } from "typeorm";
+import { Repository, Between, In } from "typeorm";
 import { Screening } from "@/entities/screening.entity";
 import { Movie } from "@/entities/movie.entity";
 import { Room } from "@/entities/room.entity";
+import { Cinema } from "@/entities/cinema.entity";
 import { CreateScreeningDto } from "./dto/create-screening.dto";
 import { UpdateScreeningDto } from "./dto/update-screening.dto";
 
@@ -21,7 +22,10 @@ export class ScreeningService {
     private readonly movieRepository: Repository<Movie>,
 
     @InjectRepository(Room)
-    private readonly theaterRepository: Repository<Room>
+    private readonly theaterRepository: Repository<Room>,
+
+    @InjectRepository(Cinema)
+    private readonly cinemaRepository: Repository<Cinema>
   ) {}
 
   async findAll(
@@ -129,6 +133,7 @@ export class ScreeningService {
 
     return this.screeningRepository.save(screening);
   }
+
   async update(
     id: number,
     updateScreeningDto: UpdateScreeningDto
@@ -160,7 +165,6 @@ export class ScreeningService {
     const isStartTimeChanging =
       startTime !== undefined &&
       new Date(startTime).getTime() !== screening.startTime.getTime();
-
 
     if (
       (startTime !== undefined || isRoomChanging) &&
@@ -244,11 +248,57 @@ export class ScreeningService {
 
     return this.screeningRepository.save(screening);
   }
+
   async remove(id: number): Promise<void> {
     const result = await this.screeningRepository.delete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException(`Screening with ID ${id} not found`);
     }
+  }
+
+  async findByCinema(cinemaId: number, dateStr?: string): Promise<Screening[]> {
+    const cinema = await this.cinemaRepository.findOne({
+      where: { id: cinemaId },
+      relations: ["rooms"],
+    });
+
+    if (!cinema) {
+      throw new NotFoundException(`Cinema with ID ${cinemaId} not found`);
+    }
+
+    const roomIds = cinema.rooms.map((room) => room.id);
+
+    if (roomIds.length === 0) {
+      return [];
+    }
+
+    const queryBuilder = this.screeningRepository
+      .createQueryBuilder("screening")
+      .leftJoinAndSelect("screening.movie", "movie")
+      .leftJoinAndSelect("screening.room", "room")
+      .leftJoinAndSelect("room.cinema", "cinema")
+      .where("room.id IN (:...roomIds)", { roomIds })
+      .orderBy("screening.startTime", "ASC");
+
+    if (dateStr) {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        throw new BadRequestException("Invalid date format");
+      }
+
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      queryBuilder.andWhere("screening.startTime BETWEEN :start AND :end", {
+        start: startOfDay,
+        end: endOfDay,
+      });
+    }
+
+    return queryBuilder.getMany();
   }
 }

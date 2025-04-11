@@ -25,6 +25,7 @@ import { Role } from "../auth/enums/role.enum";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { JWTAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
+import { Public } from "../auth/decorators/public.decorator";
 
 @ApiTags("screenings")
 @ApiBearerAuth()
@@ -126,7 +127,10 @@ export class ScreeningController {
     @Param("id") id: number,
     @Body() updateScreeningDto: UpdateScreeningDto
   ): Promise<Screening> {
-    return this.screeningService.update(id, updateScreeningDto) as Promise<Screening>;
+    return this.screeningService.update(
+      id,
+      updateScreeningDto
+    ) as Promise<Screening>;
   }
 
   @Delete(":id")
@@ -144,5 +148,36 @@ export class ScreeningController {
   })
   async remove(@Param("id") id: number): Promise<void> {
     return this.screeningService.remove(id);
+  }
+
+  @Get("cinema/:cinemaId")
+  @Roles(Role.STAFF)
+  @ApiOperation({
+    summary: "Get all screenings for a cinema - Role: Staff",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Return all screenings for a cinema",
+    type: [Screening],
+  })
+  @ApiResponse({ status: 404, description: "Cinema not found" })
+  @ApiResponse({
+    status: 403,
+    description: "You are not allowed to access this resource",
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Unauthorized",
+  })
+  @ApiQuery({
+    name: "date",
+    required: false,
+    description: "Filter by date (format: YYYY-MM-DD)",
+  })
+  async findByCinema(
+    @Param("cinemaId") cinemaId: number,
+    @Query("date") date?: string
+  ): Promise<Screening[]> {
+    return this.screeningService.findByCinema(cinemaId, date);
   }
 }
