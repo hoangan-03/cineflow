@@ -1,5 +1,11 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsArray } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsNotEmpty,
+  IsArray,
+  IsString,
+  IsOptional,
+  MaxLength,
+} from "class-validator";
 
 export class CreateBookingDTO {
   @ApiProperty({
@@ -16,4 +22,13 @@ export class CreateBookingDTO {
   @IsNotEmpty()
   @IsArray()
   seat_ids: string[];
+
+  @ApiPropertyOptional({
+    example: "ABC",
+    description: "Voucher code to apply to this booking (optional)",
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(3)
+  voucherCode?: string;
 }

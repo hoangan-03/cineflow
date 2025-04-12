@@ -14,6 +14,7 @@ import { BookingStatus } from "./enums/booking-status.enum";
 import { CreateBookingDTO } from "./dto/create-booking.dto";
 import { UpdateBookingDTO } from "./dto/update-booking.dto";
 import { generateReferenceNumber } from "./utils/reference-generator";
+import { VoucherService } from "../voucher/voucher.service";
 
 @Injectable()
 export class BookingService {
@@ -30,7 +31,9 @@ export class BookingService {
     @InjectRepository(Seat)
     private readonly seatRepository: Repository<Seat>,
 
-    private connection: Connection
+    private connection: Connection,
+
+    private voucherService: VoucherService
   ) {}
 
   async findAllByUser(userId: number): Promise<Booking[]> {
@@ -70,7 +73,7 @@ export class BookingService {
     createBookingDto: CreateBookingDTO,
     userId: number
   ): Promise<Booking> {
-    const { screening_id, seat_ids: seatIds } = createBookingDto;
+    const { screening_id, seat_ids: seatIds, voucherCode } = createBookingDto;
     const queryRunner = this.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
@@ -116,7 +119,38 @@ export class BookingService {
         );
       }
 
-      const totalAmount = screening.price * seatIds.length;
+      // Calculate total amount based on seat types
+      let totalAmount = 0;
+
+      seats.forEach((seat) => {
+        const basePrice = Number(screening.price);
+        if (seat.type === "VIP") {
+          totalAmount += basePrice * 1.5;
+        } else if (seat.type === "COUPLE") {
+          totalAmount += basePrice * 2;
+        } else {
+          totalAmount += basePrice;
+        }
+      });
+
+      if (voucherCode) {
+        try {
+          let appliedVoucher = await this.voucherService.validateVoucher(
+            voucherCode,
+            userId
+          );
+
+          const discountStr = appliedVoucher.discount;
+          const percentValue = parseInt(discountStr.replace("%", ""));
+          totalAmount = totalAmount * ((100 - percentValue) / 100);
+
+          // Round to 2 decimal places
+          totalAmount = Math.round(totalAmount * 100) / 100;
+        } catch (error) {
+          throw new BadRequestException("Voucher error");
+        }
+      }
+
       const referenceNumber = generateReferenceNumber();
 
       const booking = this.bookingRepository.create({
@@ -126,6 +160,7 @@ export class BookingService {
         status: BookingStatus.PENDING,
         user_id: userId,
         screening_id,
+        voucherCode: voucherCode || null,
       });
 
       const savedBooking = await queryRunner.manager.save(booking);
@@ -135,7 +170,9 @@ export class BookingService {
           booking_id: savedBooking.id,
           seat_id: seat.id,
           screening_id: screening_id,
-          price: screening.price,
+          price:
+            screening.price *
+            (seat.type === "VIP" ? 1.5 : seat.type === "COUPLE" ? 2 : 1),
         })
       );
 
@@ -210,8 +247,6 @@ export class BookingService {
       throw new BadRequestException(`Booking is already ${booking.status}`);
     }
 
-    // Only allow cancellation for PENDING and CONFIRMED statuses
-    // For PAID status, REFUNDED instead of CANCELLED
     if (
       booking.status === BookingStatus.PENDING ||
       booking.status === BookingStatus.CONFIRMED
@@ -269,7 +304,6 @@ export class BookingService {
     const booking = await this.findOne(id);
 
     if (updateBookingDto.status) {
-      // Staff can't update if it's already CANCELLED or REFUNDED
       if (
         booking.status === BookingStatus.CANCELLED ||
         booking.status === BookingStatus.REFUNDED
@@ -279,7 +313,6 @@ export class BookingService {
         );
       }
 
-      // Staff can set any status except for these transitions
       const forbiddenTransitions = {
         [BookingStatus.CANCELLED]: [
           BookingStatus.CONFIRMED,
@@ -304,7 +337,6 @@ export class BookingService {
       booking.status = updateBookingDto.status;
     }
 
-    // Staff can update other fields
     if (updateBookingDto.ticketCount !== undefined) {
       booking.ticketCount = updateBookingDto.ticketCount;
     }
@@ -324,7 +356,7 @@ export class BookingService {
     ) {
       throw new BadRequestException(`Booking is already ${booking.status}`);
     }
-    // Staff can directly set status based on payment status
+
     if (booking.status === BookingStatus.PAID) {
       booking.status = BookingStatus.REFUNDED;
     } else {

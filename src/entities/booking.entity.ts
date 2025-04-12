@@ -60,6 +60,14 @@ export class Booking extends BaseEntity {
   status: BookingStatus;
 
   @ApiProperty({
+    example: "ABC",
+    description: "Applied voucher code",
+    required: false,
+  })
+  @Column({ type: "varchar", length: 3, nullable: true })
+  voucherCode: string | null;
+
+  @ApiProperty({
     type: () => User,
     description: "The user who made the booking",
   })
@@ -85,6 +93,4 @@ export class Booking extends BaseEntity {
     cascade: true,
   })
   bookedSeats: BookedSeat[];
-
 }
-

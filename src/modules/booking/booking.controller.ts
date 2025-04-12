@@ -118,11 +118,20 @@ export class BookingController {
   // MOVIEGOER
   @Post()
   @Roles(Role.MOVIEGOER, Role.STAFF)
-  @ApiOperation({ summary: "Create a new booking - Role: Moviegoer/Staff" })
+  @ApiOperation({
+    summary: "Create a new booking - Role: Moviegoer/Staff",
+    description:
+      "Creates a new booking with optional voucher code for discount",
+  })
   @ApiResponse({
     status: 201,
     description: "Booking created successfully",
     type: Booking,
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      "Bad request - Invalid voucher, expired voucher, or already booked seats",
   })
   @ApiResponse({
     status: 401,
