@@ -137,7 +137,7 @@ export class AuthService {
     response.clearCookie("refresh_token", {
       httpOnly: true,
       signed: true,
-      sameSite: "strict",
+      sameSite: "lax", // Change from "strict" to "lax"
       secure: process.env.NODE_ENV === "production",
       path: "/api/auth/refresh",
     });

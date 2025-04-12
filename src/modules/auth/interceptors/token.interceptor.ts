@@ -48,7 +48,7 @@ export class TokenInterceptor implements NestInterceptor {
           response.cookie("refresh_token", data.data.refresh_token, {
             httpOnly: true,
             signed: true,
-            sameSite: "strict",
+            sameSite: "none",
             secure: process.env.NODE_ENV === "production",
             maxAge: AuthConstant.REFRESH_TOKEN_EXPIRATION * 1000, // Convert to milliseconds
             path: "/api/auth/refresh", // Restrict to refresh endpoint only
@@ -80,10 +80,10 @@ export class TokenInterceptor implements NestInterceptor {
           response.cookie("refresh_token", tokens.data.refresh_token, {
             httpOnly: true,
             signed: true,
-            sameSite: "strict",
+            sameSite: "none", // Change from "strict" to "lax"
             secure: process.env.NODE_ENV === "production",
             maxAge: AuthConstant.REFRESH_TOKEN_EXPIRATION * 1000,
-            path: "/api/auth/refresh", // Restrict to refresh endpoint only
+            path: "/api/auth/refresh",
           });
         }
 
